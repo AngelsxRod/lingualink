@@ -5,11 +5,14 @@
   "main": "index.js",
   "type": "module",
   "imports": {
+    "#permission": "./src/modules/permission/index.js",
     "#modules": "./src/modules/index.js",
     "#user": "./src/modules/user/index.js",
     "#tag": "./src/modules/tag/index.js",
     "#question": "./src/modules/question/index.js",
-    "#answer": "./src/modules/answer/index.js"
+    "#answer": "./src/modules/answer/index.js",
+    "#middleware": "./src/middlewares/index.js",
+    "#role": "./src/modules/role/index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -28,6 +31,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-validator": "^7.2.1",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.1",

@@ -3,7 +3,14 @@ import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import config from "./config.js";
-import { tagRoutes, userRoutes, questionRoutes, answerRoutes } from "#modules";
+import {
+  tagRoutes,
+  userRoutes,
+  questionRoutes,
+  answerRoutes,
+  permissionRoutes,
+  roleRoutes,
+} from "#modules";
 
 const app = express();
 const port = config.port || 2656;
@@ -21,6 +28,8 @@ app.use("/tags", tagRoutes.router);
 app.use("/user", userRoutes.router);
 app.use("/question", questionRoutes.router);
 app.use("/answer", answerRoutes.router);
+app.use("/permission", permissionRoutes.router);
+app.use("/role", roleRoutes.router);
 
 export const initServer = () => {
   app.listen(port);
