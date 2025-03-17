@@ -20,7 +20,7 @@ export const valiterPermissionExists = async (id) => {
 
 export const validatePermissionUniqueForUpdate = async (name, id) => {
   const permission = await Permission.findOne({ name });
-  if (permission.id !== id) {
+  if (permission && permission.id !== id) {
     throw new Error("El permiso ya existe");
   }
 };

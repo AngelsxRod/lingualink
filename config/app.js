@@ -10,6 +10,7 @@ import {
   answerRoutes,
   permissionRoutes,
   roleRoutes,
+  authRoutes,
 } from "#modules";
 
 const app = express();
@@ -30,6 +31,7 @@ app.use("/question", questionRoutes.router);
 app.use("/answer", answerRoutes.router);
 app.use("/permission", permissionRoutes.router);
 app.use("/role", roleRoutes.router);
+app.use("/auth", authRoutes.router);
 
 export const initServer = () => {
   app.listen(port);
