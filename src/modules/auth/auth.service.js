@@ -15,10 +15,11 @@ export const login = async (data) => {
     const token = await generarJWT({
       id: user._id,
       email: user.email,
+      username: user.username,
       role: user.role,
     });
 
-    return token;
+    return {token};
   } catch (error) {
     throw new Error(error.message);
   }

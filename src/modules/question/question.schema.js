@@ -10,7 +10,7 @@ const questionSchema = new Schema(
       type: String,
       required: true,
     },
-    userId: {
+    user: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
@@ -20,18 +20,22 @@ const questionSchema = new Schema(
         ref: "Tag",
       },
     ],
-    votes: [
-      {
-        userId: {
-          type: Schema.Types.ObjectId,
-          ref: "User",
+    votes: {
+      type: [
+        {
+          userId: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+          },
+          vote: {
+            type: Number,
+            enum: [0, 1],
+          },
         },
-        vote: {
-          type: Number,
-          enum: [0, 1],
-        },
-      },
-    ],
+      ],
+      default: [],
+    },
     status: {
       type: Boolean,
       default: true,

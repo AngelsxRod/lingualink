@@ -1,8 +1,7 @@
-import { check } from "express-validator";
+import { permissionValidator, validateFields } from "#middleware";
 import { Role } from "#role";
-import { validateFields } from "#middleware";
-import { Permission } from "#permission";
-// Validación para asegurar que el rol es único
+import { check } from "express-validator";
+
 export const validateRoleUnique = async (name) => {
   const role = await Role.findOne({ name });
   if (role) {
@@ -26,26 +25,6 @@ export const validateRoleUniqueForUpdate = async (name, id) => {
   }
 };
 
-export const validatePermissionsExist = async (permissions) => {
-  if (permissions && permissions.length > 0) {
-    const invalidPermissions = [];
-
-    for (const permissionId of permissions) {
-      const permission = await Permission.findById(permissionId);
-      if (!permission) {
-        invalidPermissions.push(permissionId);
-      }
-    }
-
-    if (invalidPermissions.length > 0) {
-      throw new Error(
-        `Los siguientes permisos no existen: ${invalidPermissions.join(", ")}`
-      );
-    }
-  }
-  return true;
-};
-
 export const AddRoleValidators = [
   check("name", "El nombre es obligatorio").notEmpty(),
   check("name", "El nombre debe tener al menos 3 caracteres").isLength({
@@ -59,7 +38,15 @@ export const AddRoleValidators = [
   ).isLength({
     min: 3,
   }),
-  check("permissions").optional().custom(validatePermissionsExist),
+  check("permissions")
+    .optional()
+    .custom(permissionValidator.validatePermissionsExist),
+  check("permissions", "Los permisos deben ser un arreglo")
+    .optional()
+    .isArray(),
+  check("permissions", "El id de permiso debe ser válido")
+    .optional()
+    .isMongoId(),
   validateFields,
 ];
 
@@ -77,7 +64,13 @@ export const UpdateRoleValidators = [
   check("description", "La descripción debe tener al menos 3 caracteres")
     .optional()
     .isLength({ min: 3 }),
-  check("permissions").optional().custom(validatePermissionsExist),
+  check("permissions")
+    .optional()
+    .custom(permissionValidator.validatePermissionsExist),
+  check("permissions").optional().isArray(),
+  check("permissions.*", "El id de permiso debe ser válido")
+    .optional()
+    .isMongoId(),
   validateFields,
 ];
 

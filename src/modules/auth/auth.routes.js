@@ -4,10 +4,10 @@ import {
   registerController,
   changePasswordController,
 } from "#auth";
-import { validateJWT } from "#middleware";
+import { validateJWT, userValidator } from "#middleware";
 
 export const router = Router();
 
 router.post("/login", loginController);
-router.post("/register", registerController);
+router.post("/register", userValidator.AddUserValidators ,registerController);
 router.post("/change-password", validateJWT, changePasswordController);

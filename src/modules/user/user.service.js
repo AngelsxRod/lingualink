@@ -31,3 +31,11 @@ export const getUsers = async (page = 1, pageSize = 10) => {
   }
 };
 
+export const getProfile = async (id) => {
+  try {
+    const user = await User.findById(id);
+    return user;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};

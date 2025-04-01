@@ -4,8 +4,7 @@ import { User } from "#user";
 import config from "../../config/config.js";
 
 export const validateJWT = async (req, res, next) => {
-  // Se extrae el token del encabezado Authorization
-  const token = req.header("Authorization")?.split(" ")[1]; // Tomamos la segunda parte (después de 'Bearer')
+  const token = req.header("Authorization")?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "Acceso denegado" });
 
   try {

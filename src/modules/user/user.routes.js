@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { createUserController, getUsersController } from "#user";
+import {
+  createUserController,
+  getUsersController,
+  getProfileController,
+} from "#user";
 import { validateJWT, permissionMiddleware } from "#middleware";
 export const router = Router();
 
@@ -9,4 +13,6 @@ router.get(
   permissionMiddleware("LISTAR_USUARIOS"),
   getUsersController
 );
+router.get("/profile", validateJWT, getProfileController);
+
 router.post("/", createUserController);

@@ -14,19 +14,28 @@ const asnwerSchema = new Schema(
       type: String,
       required: true,
     },
-    votes: [
-      {
-        userId: {
-          type: Schema.Types.ObjectId,
-          required: true,
+    votes: {
+      type: [
+        {
+          userId: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+          },
+          vote: {
+            type: Number,
+            enum: [0, 1],
+          },
         },
-        vote: {
-          type: Number,
-          enum: [0, 1],
-          required: true,
-        },
-      },
-    ],
+      ],
+
+      default: [],
+      _id: false,
+    },
+    status: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,

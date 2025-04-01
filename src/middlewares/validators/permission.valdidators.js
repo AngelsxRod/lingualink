@@ -10,10 +10,10 @@ export const validatePermissionUnique = async (name) => {
   return true;
 };
 
-export const valiterPermissionExists = async (id) => {
+export const validatePermissionExists = async (id) => {
   const permission = await Permission.findById(id);
   if (!permission) {
-    throw new Error("El permiso no existe");
+    throw new Error(`El permiso ${id} no existe`);
   }
   return true;
 };
@@ -23,6 +23,15 @@ export const validatePermissionUniqueForUpdate = async (name, id) => {
   if (permission && permission.id !== id) {
     throw new Error("El permiso ya existe");
   }
+};
+
+export const validatePermissionsExist = async (permissions) => {
+  if (permissions && permissions.length > 0) {
+    for (const permissionId of permissions) {
+      await validatePermissionExists(permissionId);
+    }
+  }
+  return true;
 };
 
 export const AddPermissionValidators = [
@@ -44,7 +53,7 @@ export const AddPermissionValidators = [
 export const UpdatePermissionValidators = [
   check("id", "El id es obligatorio").notEmpty(),
   check("id", "El id no es válido").isMongoId(),
-  check("id").custom(valiterPermissionExists),
+  check("id").custom(validatePermissionExists),
   check("name", "El nombre debe tener al menos 3 caracteres")
     .optional()
     .isLength({ min: 3 })
@@ -61,6 +70,6 @@ export const UpdatePermissionValidators = [
 export const DeletePermissionValidators = [
   check("id", "El id es obligatorio").notEmpty(),
   check("id", "El id no es válido").isMongoId(),
-  check("id").custom(valiterPermissionExists),
+  check("id").custom(validatePermissionExists),
   validateFields,
 ];
