@@ -2,6 +2,8 @@ import { Router } from "express";
 import {
   getAnswersController,
   createAnswerController,
+  updateAnswerController,
+  deleteAnswerController,
   voteAnswerController,
 } from "#answer";
 import { answerValidator, validateJWT } from "#middleware";
@@ -15,6 +17,20 @@ router.post(
   validateJWT,
   answerValidator.AddAnswerValidators,
   createAnswerController
+);
+
+router.put(
+  "/:id",
+  validateJWT,
+  answerValidator.UpdateAnswerValidators,
+  updateAnswerController
+);
+
+router.delete(
+  "/:id",
+  validateJWT,
+  answerValidator.DeleteAnswerValidators,
+  deleteAnswerController
 );
 
 router.post(

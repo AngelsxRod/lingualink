@@ -50,6 +50,28 @@ export const createAnswer = async (data) => {
   }
 };
 
+export const updateAnswer = async (id, data) => {
+  try {
+    const answer = await Answer.findByIdAndUpdate(id, data, { new: true });
+    return answer;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export const deleteAnswer = async (id) => {
+  try {
+    const answer = await Answer.findByIdAndUpdate(
+      id,
+      { status: false },
+      { new: true }
+    );
+    return answer;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 export const voteAnswer = async (data) => {
   try {
     const updatedAnswer = await Answer.findByIdAndUpdate(

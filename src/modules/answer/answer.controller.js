@@ -1,4 +1,4 @@
-import { getAnswers, createAnswer, voteAnswer } from "#answer";
+import { getAnswers, createAnswer, updateAnswer, deleteAnswer, voteAnswer, Answer } from "#answer";
 
 export const getAnswersController = async (req, res) => {
   try {
@@ -26,6 +26,27 @@ export const createAnswerController = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const updateAnswerController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const answer = await updateAnswer(id, req.body);
+    return res.json(answer);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteAnswerController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const answer = await deleteAnswer(id);
+    return res.json(answer);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 
 export const voteAnswerController = async (req, res) => {
   try {
