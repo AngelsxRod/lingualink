@@ -13,6 +13,8 @@ import {
   authRoutes,
 } from "#modules";
 
+import ServerlessHttp from "serverless-http";
+
 const app = express();
 const port = config.port || 2656;
 // Middlewares
@@ -20,7 +22,12 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "*"],
+    credentials: true,
+  })
+);
 app.use(helmet());
 app.use(morgan("dev"));
 
@@ -37,3 +44,5 @@ export const initServer = () => {
   app.listen(port);
   console.log(`Server HTTP running in port ${port}`);
 };
+
+export const handler = ServerlessHttp(app);
