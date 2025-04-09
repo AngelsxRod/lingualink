@@ -39,6 +39,11 @@ app.use("/answer", answerRoutes.router);
 app.use("/permission", permissionRoutes.router);
 app.use("/role", roleRoutes.router);
 app.use("/auth", authRoutes.router);
+app.use("/test", (req, res) => {
+  res.json({
+    message: "Hello World",
+  });
+});
 
 export const initServer = () => {
   app.listen(port, () => {
