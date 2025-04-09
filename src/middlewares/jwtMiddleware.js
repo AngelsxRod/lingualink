@@ -5,7 +5,10 @@ import config from "../../config/config.js";
 
 export const validateJWT = async (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Acceso denegado" });
+  if (!token)
+    return res.status(401).json({ message: "Inicia sesion porfavor" });
+  if (token === "null")
+    return res.status(401).json({ message: "Token no válido" });
 
   try {
     const { id } = jwt.verify(token, config.jwtSecret);

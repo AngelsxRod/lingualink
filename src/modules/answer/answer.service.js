@@ -1,13 +1,13 @@
 import { Answer } from "#answer";
 
-export const getAnswers = async (page = 1, pageSize = 10) => {
+export const getAnswers = async (page = 1, pageSize = 10, questionId) => {
   try {
     page = parseInt(page);
     pageSize = parseInt(pageSize);
     const skip = (page - 1) * pageSize;
 
-    const answers = await Answer.find({ status: true })
-      .populate("userId", "username")
+    const answers = await Answer.find({ status: true, questionId })
+      .populate("user", "username")
       .populate("questionId", "title")
       .skip(skip)
       .limit(pageSize)
@@ -24,7 +24,6 @@ export const getAnswers = async (page = 1, pageSize = 10) => {
         ...answer,
         positiveVotes,
         negativeVotes,
-        question: answer.questionId.title,
       };
     });
     const totalAnswers = await Answer.countDocuments({ status: true });

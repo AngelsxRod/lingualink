@@ -1,9 +1,17 @@
-import { getAnswers, createAnswer, updateAnswer, deleteAnswer, voteAnswer, Answer } from "#answer";
+import {
+  getAnswers,
+  createAnswer,
+  updateAnswer,
+  deleteAnswer,
+  voteAnswer,
+  Answer,
+} from "#answer";
 
 export const getAnswersController = async (req, res) => {
   try {
+    const { questionId } = req.params;
     const { page, pageSize } = req.query;
-    const answers = await getAnswers(page, pageSize);
+    const answers = await getAnswers(page, pageSize, questionId);
     return res.json(answers);
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -14,10 +22,10 @@ export const createAnswerController = async (req, res) => {
   try {
     const { questionId } = req.params;
     const { content } = req.body;
-    const { id: userId } = req.user;
+    const { id: user } = req.user;
     const answerData = {
       content,
-      userId,
+      user,
       questionId,
     };
     const answer = await createAnswer(answerData);
@@ -46,7 +54,6 @@ export const deleteAnswerController = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 
 export const voteAnswerController = async (req, res) => {
   try {

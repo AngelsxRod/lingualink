@@ -10,7 +10,7 @@ import { answerValidator, validateJWT } from "#middleware";
 
 export const router = Router();
 
-router.get("/", getAnswersController);
+router.get("/:questionId", getAnswersController);
 
 router.post(
   "/:questionId",

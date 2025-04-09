@@ -5,12 +5,16 @@ import {
   getQuestionsController,
   updateQuestionController,
   voteQuestionController,
+  getQuestionByIdController,
 } from "#question";
 import { questionValidator, validateJWT } from "#middleware";
 
 export const router = Router();
 
 router.get("/", getQuestionsController);
+
+router.get("/:id", getQuestionByIdController);
+
 router.post(
   "/",
   validateJWT,

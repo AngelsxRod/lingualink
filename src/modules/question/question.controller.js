@@ -4,6 +4,7 @@ import {
   updateQuestion,
   deleteQuestion,
   voteQuestion,
+  getQuestionById,
 } from "#question";
 
 export const getQuestionsController = async (req, res) => {
@@ -11,6 +12,19 @@ export const getQuestionsController = async (req, res) => {
     const { page, pageSize } = req.query;
     const questions = await getQuestions(page, pageSize);
     return res.json(questions);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const getQuestionByIdController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const question = await getQuestionById(id);
+    if (!question) {
+      return res.status(404).json({ message: "Pregunta no existe" });
+    }
+    return res.json(question);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
