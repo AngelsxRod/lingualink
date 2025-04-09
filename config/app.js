@@ -41,8 +41,9 @@ app.use("/role", roleRoutes.router);
 app.use("/auth", authRoutes.router);
 
 export const initServer = () => {
-  app.listen(port);
-  console.log(`Server HTTP running in port ${port}`);
+  app.listen(port, () => {
+    console.log(`Server running in port ${port}`);
+  });
 };
 
 export const handler = ServerlessHttp(app);
