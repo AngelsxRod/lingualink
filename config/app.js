@@ -24,10 +24,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(
   cors({
-    origin: ["https://lingualink-app-git-master-arodriguez-20199620s-projects.vercel.app/", "*"],
-    credentials: true,
+    origin: "https://lingualink-app-git-master-arodriguez-20199620s-projects.vercel.app",
   })
 );
+
 app.use(helmet());
 app.use(morgan("dev"));
 
