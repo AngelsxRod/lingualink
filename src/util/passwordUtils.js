@@ -2,9 +2,9 @@ import argon2 from "argon2";
 
 const argon2Options = {
   type: argon2.argon2id,
-  memoryCost: 1024 * 1024,
-  timeCost: 3,
-  parallelism: 2,
+  memoryCost: 64 * 1024,
+  timeCost: 2,          
+  parallelism: 2,       
 };
 
 export async function encryptPassword(password) {
