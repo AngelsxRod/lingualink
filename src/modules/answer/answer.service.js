@@ -9,6 +9,7 @@ export const getAnswers = async (page = 1, pageSize = 10, questionId) => {
     const answers = await Answer.find({ status: true, questionId })
       .populate("user", "username")
       .populate("questionId", "title")
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(pageSize)
       .lean();
@@ -26,7 +27,10 @@ export const getAnswers = async (page = 1, pageSize = 10, questionId) => {
         negativeVotes,
       };
     });
-    const totalAnswers = await Answer.countDocuments({ status: true });
+    const totalAnswers = await Answer.countDocuments({
+      status: true,
+      questionId,
+    });
     return {
       answers: answersWithVotes,
       pageSize,

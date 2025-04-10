@@ -7,22 +7,20 @@ export const getQuestions = async (page = 1, pageSize = 10) => {
     pageSize = parseInt(pageSize);
     const skip = (page - 1) * pageSize;
 
-    // Obtener las preguntas con las poblaciones necesarias
     const questions = await Question.find({ status: true })
       .populate("user", "username")
       .populate("tags", "name")
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(pageSize)
       .lean();
 
-    // Obtener el conteo de respuestas para cada pregunta
     const questionsWithAnswersCount = await Promise.all(
       questions.map(async (question) => {
         const answersCount = await Answer.countDocuments({
           questionId: question._id,
         });
 
-        // Calcular los votos positivos y negativos
         const positiveVotes = question.votes.filter(
           (vote) => vote.vote === 1
         ).length;
@@ -32,14 +30,13 @@ export const getQuestions = async (page = 1, pageSize = 10) => {
 
         return {
           ...question,
-          answersCount, // Agregar el conteo de respuestas
+          answersCount,
           positiveVotes,
           negativeVotes,
         };
       })
     );
 
-    // Contar el total de preguntas
     const totalQuestions = await Question.countDocuments({ status: true });
 
     return {
@@ -121,14 +118,23 @@ export const deleteQuestion = async (id) => {
 
 export const voteQuestion = async (data) => {
   try {
-    const updatedQuestion = await Question.findByIdAndUpdate(
-      data.id,
-      {
-        $push: { votes: { userId: data.userId, vote: data.vote } },
-      },
-      { new: true }
+    const question = await Question.findById(data.id);
+
+    if (!question) {
+      throw new Error("Pregunta no existe");
+    }
+
+    const existingVoteIndex = question.votes.findIndex(
+      (vote) => vote.userId.toString() === data.userId
     );
 
+    if (existingVoteIndex !== -1) {
+      question.votes[existingVoteIndex].vote = data.vote;
+    } else {
+      question.votes.push({ userId: data.userId, vote: data.vote });
+    }
+
+    const updatedQuestion = await question.save();
     return updatedQuestion;
   } catch (error) {
     throw new Error(error.message);

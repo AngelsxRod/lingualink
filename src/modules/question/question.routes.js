@@ -35,9 +35,4 @@ router.delete(
   deleteQuestionController
 );
 
-router.post(
-  "/:id/vote",
-  validateJWT,
-  questionValidator.VoteQuestionValidators,
-  voteQuestionController
-);
+router.post("/:id/vote", validateJWT, voteQuestionController);
