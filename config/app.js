@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://lingualink-app-git-master-arodriguez-20199620s-projects.vercel.app",
+    origin: "https://lingualink-app.vercel.app/",
   })
 );
 

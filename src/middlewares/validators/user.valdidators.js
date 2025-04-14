@@ -73,6 +73,6 @@ export const AddUserValidators = [
   ).notEmpty(),
 
   check("role", "El rol debe ser un ID válido").optional().isMongoId(),
-  check("role").custom(roleValidator.validateRoleExists),
+  check("role").optional().custom(roleValidator.validateRoleExists),
   validateFields,
 ];

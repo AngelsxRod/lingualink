@@ -31,7 +31,6 @@ const asnwerSchema = new Schema(
       ],
 
       default: [],
-      _id: false,
     },
     status: {
       type: Boolean,

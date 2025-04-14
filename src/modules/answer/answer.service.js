@@ -74,16 +74,25 @@ export const deleteAnswer = async (id) => {
     throw new Error(error.message);
   }
 };
-
 export const voteAnswer = async (data) => {
   try {
-    const updatedAnswer = await Answer.findByIdAndUpdate(
-      data.id,
-      {
-        $push: { votes: { userId: data.userId, vote: data.vote } },
-      },
-      { new: true }
+    const answer = await Answer.findById(data.id);
+
+    if (!answer) {
+      throw new Error("Respuesta no existe");
+    }
+
+    const existingVoteIndex = answer.votes.findIndex(
+      (vote) => vote.userId.toString() === data.userId
     );
+
+    if (existingVoteIndex !== -1) {
+      answer.votes[existingVoteIndex].vote = data.vote;
+    } else {
+      answer.votes.push({ userId: data.userId, vote: data.vote });
+    }
+
+    const updatedAnswer = await answer.save();
     return updatedAnswer;
   } catch (error) {
     throw new Error(error.message);
