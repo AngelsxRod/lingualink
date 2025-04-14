@@ -6,9 +6,10 @@ import AuthLayout from "../layouts/AuthLayout";
 const Home = lazy(() => import("../pages/main/Home"));
 const About = lazy(() => import("../pages/main/About"));
 const Objectives = lazy(() => import("../pages/main/Objectives"));
-const Login = lazy(() => import("../pages/auth/Login"));
 const Question = lazy(() => import("../pages/main/Question"));
 
+const Login = lazy(() => import("../pages/auth/Login"));
+const Register = lazy(() => import("../pages/auth/Register"));
 const Routes = () => {
   return useRoutes([
     {
@@ -28,6 +29,10 @@ const Routes = () => {
         {
           path: "login",
           element: <Login />,
+        },
+        {
+          path: "register",
+          element: <Register />,
         },
       ],
     },

@@ -33,8 +33,8 @@ const AnswerForm = ({ defaultValues, OnEvent, actions, questionId }) => {
 
   const handleContentChange = (e) => {
     if (!isAuthenticated) {
-      toast.error("Debes iniciar sesión para escribir un comentario");
-      setValue("content", ""); // Limpia el contenido del campo
+      setValue("content", ""); 
+      return;
     }
   };
 

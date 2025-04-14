@@ -5,6 +5,7 @@ import { useFormContext } from "react-hook-form";
 export const InputField = ({
   icon: Icon,
   type = "text",
+  darkMode = false,
   placeholder,
   label = "",
   name = "",
@@ -19,19 +20,23 @@ export const InputField = ({
 
   const inputType = type === "password" && showPassword ? "text" : type;
 
+  const labelClass = darkMode
+    ? "block text-white text-base font-semibold mb-1"
+    : "block text-gray-900 text-base font-semibold mb-1";
+
   return (
     <div className="relative">
       {/* LABEL */}
       {label && (
         <label
           htmlFor={name}
-          className="block ml-1 text-gray-900 text-base font-semibold mb-2"
+          className={`${labelClass}`}
         >
           {label}
         </label>
       )}
       {/* INPUT */}
-      <div className="flex items-center border-2 border-gray-200 py-3 px-3 rounded">
+      <div className="flex items-center border-2 border-gray-200 py-3 px-3 rounded bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)] focus-within:border-emerald-500 transition duration-200 ease-in-out">
         {Icon && <Icon className="h-5 w-5 text-gray-400 mr-2" />}
         <input
           id={name}
@@ -56,7 +61,7 @@ export const InputField = ({
       </div>
       {/* ERROR MESSAGE */}
       {errors[name] && (
-        <span className="absolute ml-2 font-medium text-red-500 text-sm">
+        <span className="absolute ml-2 font-medium text-rose-600 text-sm">
           {errors[name].message}
         </span>
       )}

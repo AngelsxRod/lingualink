@@ -22,7 +22,19 @@ export const answerApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: ["Answers"],
     }),
+    voteAnswer: builder.mutation({
+      query: ({ id, vote }) => ({
+        url: `/answer/${id}/vote`,
+        method: "POST",
+        body: { vote },
+      }),
+      invalidatesTags: ["Answers"],
+    }),
   }),
 });
 
-export const { useGetAnswersQuery, useCreateAnswerMutation } = answerApi;
+export const {
+  useGetAnswersQuery,
+  useCreateAnswerMutation,
+  useVoteAnswerMutation,
+} = answerApi;

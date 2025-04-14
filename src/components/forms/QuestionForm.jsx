@@ -101,43 +101,43 @@ const QuestionForm = ({ isOpen, onClose, defaultValues, OnEvent, actions }) => {
                   },
                 }}
               />
+              <div>
+                <h2 className="text-lg font-semibold text-center text-gray-800">
+                  Selecciona las etiquetas:
+                </h2>
+
+                <div className="flex justify-items-center">
+                  <button
+                    type="button"
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                    className="cursor-pointer disabled:cursor-not-allowed disabled:text-black flex w-8 h-8 mx-1 justify-center items-center rounded-full border border-gray-200 bg-white text-emerald-300 hover:border-gray-300 disabled:opacity-50"
+                  >
+                    <ChevronLeft />
+                  </button>
+                  <div className="flex space-x-2 mx-auto">
+                    {tagsData?.tags?.map((tag) => (
+                      <TagButton
+                        key={tag._id}
+                        label={tag.name}
+                        active={selectedTags.includes(tag._id)}
+                        onClick={() => handleClick(tag._id)}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleNextPage}
+                    disabled={tagsData?.currentPage >= tagsData?.totalPages}
+                    className="cursor-pointer disabled:cursor-not-allowed disabled:text-black flex w-8 h-8 mx-1 justify-center items-center rounded-full border border-gray-200 bg-white text-emerald-300 hover:border-gray-300 disabled:opacity-50"
+                  >
+                    <ChevronRight />
+                  </button>
+                </div>
+              </div>
             </>
           )}
 
-          <div>
-            <h2 className="text-lg font-semibold text-center text-gray-800">
-              Selecciona las etiquetas:
-            </h2>
-
-            <div className="flex justify-items-center">
-              <button
-                type="button"
-                onClick={handlePreviousPage}
-                disabled={currentPage === 1}
-                className="cursor-pointer disabled:cursor-not-allowed disabled:text-black flex w-8 h-8 mx-1 justify-center items-center rounded-full border border-gray-200 bg-white text-emerald-300 hover:border-gray-300 disabled:opacity-50"
-              >
-                <ChevronLeft />
-              </button>
-              <div className="flex space-x-2 mx-auto">
-                {tagsData?.tags?.map((tag) => (
-                  <TagButton
-                    key={tag._id}
-                    label={tag.name}
-                    active={selectedTags.includes(tag._id)}
-                    onClick={() => handleClick(tag._id)}
-                  />
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={handleNextPage}
-                disabled={tagsData?.currentPage >= tagsData?.totalPages}
-                className="cursor-pointer disabled:cursor-not-allowed disabled:text-black flex w-8 h-8 mx-1 justify-center items-center rounded-full border border-gray-200 bg-white text-emerald-300 hover:border-gray-300 disabled:opacity-50"
-              >
-                <ChevronRight />
-              </button>
-            </div>
-          </div>
           <div className="mt-4">
             <Button
               variant="solid"

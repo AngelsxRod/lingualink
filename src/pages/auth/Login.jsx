@@ -1,19 +1,23 @@
-import { useNavigate } from "react-router-dom";
+import { House } from "lucide-react";
 import { LoginForm } from "../../components/forms";
 import { Button } from "../../components/ui";
-import { SquareArrowLeft } from "lucide-react";
+import useNavigator from "../../hooks/useNavigator";
 const Login = () => {
-  const navigate = useNavigate(); // Esto te permitirá navegar
+  const { goTo } = useNavigator();
 
   const handleGoBack = () => {
-    navigate(-1); // Esto llevará al usuario a la página anterior
+    goTo("/");
+  };
+
+  const handleGoToRegister = () => {
+    goTo("/auth/register");
   };
 
   return (
     <div className="h-screen md:flex">
       {/* Botón de regresar */}
       <Button className="absolute z-50 top-4 left-4" onClick={handleGoBack}>
-        <SquareArrowLeft />
+        <House />
       </Button>
 
       <div
@@ -44,6 +48,15 @@ const Login = () => {
             Bienvenido de nuevo, estudiante
           </p>
           <LoginForm />
+          <p className="text-center mt-6 text-sm text-gray-400">
+            ¿No tienes una cuenta?{" "}
+            <span
+              className="text-blue-500 hover:underline cursor-pointer"
+              onClick={handleGoToRegister}
+            >
+              Regístrate
+            </span>
+          </p>
         </div>
       </div>
     </div>

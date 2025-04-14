@@ -23,7 +23,7 @@ export const TextArea = ({
         </label>
       )}
       {/* INPUT */}
-      <div className="flex items-center border-2 border-gray-200 py-3 px-3 rounded">
+      <div className="flex items-center border-2 border-gray-200 py-3 px-3 rounded bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)] focus-within:border-emerald-500 transition duration-200 ease-in-out">
         <textarea
           id={name}
           name={name}

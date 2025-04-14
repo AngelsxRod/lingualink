@@ -1,20 +1,20 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, Clock, ThumbsDown, ThumbsUp, User } from "lucide-react";
+import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
+import { decodeToken } from "../../Utils/JWTUtil";
+import { formatDate } from "../../Utils/formatDate";
 import AnswerForm from "../../components/forms/AnswerForm";
-
+import { AnswerCard } from "../../components/ui";
 import {
-  useGetAnswersQuery,
   useCreateAnswerMutation,
+  useGetAnswersQuery
 } from "../../features/api/answerApi";
 import {
   useGetQuestionByIdQuery,
   useVoteQuestionMutation,
 } from "../../features/api/questionApi";
-import { formatDate } from "../../Utils/formatDate";
 import useAuth from "../../hooks/useAuth";
-import toast from "react-hot-toast";
-import { decodeToken } from "../../Utils/JWTUtil";
 
 const Question = () => {
   const { id } = useParams();
@@ -22,14 +22,18 @@ const Question = () => {
   const { data, error, isLoading } = useGetQuestionByIdQuery(id);
   const [voteQuestion] = useVoteQuestionMutation();
   const { isAuthenticated, token } = useAuth();
+  const { data: dataAnswers } = useGetAnswersQuery({
+    page: 1,
+    pageSize: 10,
+    questionId: id,
+  });
 
   let userId = null;
+
   if (isAuthenticated) {
     const decoded = decodeToken(token);
     userId = decoded.id;
   }
-
-  const userVote = data?.votes?.find((v) => v.userId === userId);
 
   const handleVote = async (vote) => {
     try {
@@ -43,17 +47,13 @@ const Question = () => {
     }
   };
 
-  const { data: dataAnswers } = useGetAnswersQuery({
-    page: 1,
-    pageSize: 10,
-    questionId: id,
-  });
   const [
     createAnswer,
     { isLoading: isCreatingAnswer, isError: isErrorAnswer },
   ] = useCreateAnswerMutation();
 
   const answers = dataAnswers?.answers || [];
+  const userVote = data?.votes?.find((v) => v.userId === userId);
 
   if (isLoading)
     return (
@@ -95,19 +95,14 @@ const Question = () => {
             whileTap={{ scale: 0.9, rotate: -10 }}
             onClick={() => handleVote(1)}
             disabled={userVote?.vote === 1}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all
+            className={`disabled:cursor-not-allowed flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all
               ${
                 userVote?.vote === 1
                   ? "bg-green-200 border-2 border-green-500 text-green-800"
                   : "bg-green-100 hover:bg-green-200 text-green-800"
               }`}
           >
-            <motion.div
-              whileHover={{ scale: 1.3, rotate: 15 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <ThumbsUp />
-            </motion.div>
+            <ThumbsUp />
             <span>{data.positiveVotes}</span>
           </motion.button>
 
@@ -117,19 +112,14 @@ const Question = () => {
             whileTap={{ scale: 0.9, rotate: 10 }}
             onClick={() => handleVote(0)}
             disabled={userVote?.vote === 0}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all
+            className={`disabled:cursor-not-allowed flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all
               ${
                 userVote?.vote === 0
                   ? "bg-rose-200 border-2 border-rose-500 text-rose-800"
                   : "bg-rose-100 hover:bg-rose-200 text-rose-800"
               }`}
           >
-            <motion.div
-              whileHover={{ scale: 1.3, rotate: -15 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <ThumbsDown />
-            </motion.div>
+            <ThumbsDown />
             <span>{data.negativeVotes}</span>
           </motion.button>
         </div>
@@ -139,18 +129,14 @@ const Question = () => {
 
       <div className="flex justify-between items-center text-sm text-gray-500 mb-4">
         <span className="flex items-center gap-1">
-          <motion.div whileHover={{ scale: 1.2 }}>
-            <User className="w-4 h-4" />
-          </motion.div>
+          <User className="w-4 h-4" />
           Publicado por:{" "}
           <span className="font-medium text-gray-700">
             {data.user.username}
           </span>
         </span>
         <span className="flex items-center gap-1">
-          <motion.div whileHover={{ scale: 1.2 }}>
-            <Clock className="w-4 h-4" />
-          </motion.div>
+          <Clock className="w-4 h-4" />
           {formattedDate}
         </span>
       </div>
@@ -171,24 +157,17 @@ const Question = () => {
         actions={{ isLoading: isCreatingAnswer, isError: isErrorAnswer }}
         questionId={id}
       />
-
       <div className="mb-6">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">
           Respuestas ({dataAnswers?.totalAnswers || 0})
         </h2>
         {answers.map((answer) => (
-          <div key={answer._id} className="p-4 bg-gray-100 rounded-lg mb-4">
-            <p className="text-gray-700 mb-2">{answer.content}</p>
-            <div className="text-sm text-gray-500 flex justify-between">
-              <span>
-                Por:{" "}
-                <span className="font-medium text-gray-700">
-                  {answer.user.username}
-                </span>
-              </span>
-              <span>{formatDate(answer.createdAt)}</span>
-            </div>
-          </div>
+          <AnswerCard
+            key={answer._id}
+            answer={answer}
+            userId={userId}
+            isAuthenticated={isAuthenticated}
+          />
         ))}
       </div>
     </div>

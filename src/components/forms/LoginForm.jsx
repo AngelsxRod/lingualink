@@ -1,6 +1,7 @@
 import { Lock, Mail } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Button, InputField } from "../ui";
+import { Link } from "react-router-dom";
 
 import useAuth from "../../hooks/useAuth";
 export const LoginForm = () => {
@@ -48,12 +49,15 @@ export const LoginForm = () => {
           }}
         />
         <div className="mt-4">
-          <Button variant="solid" className="w-full py-2" type="submit" disabled={isLoading}> 
+          <Button
+            variant="solid"
+            className="w-full py-2"
+            type="submit"
+            disabled={isLoading}
+          >
             {isLoading ? "Cargando..." : "Iniciar sesión"}
           </Button>
-          <span className="text-sm ml-2 mt-2 block hover:text-blue-500 cursor-pointer ">
-            ¿Olvidaste tu contraseña?
-          </span>
+          
         </div>
       </form>
     </FormProvider>

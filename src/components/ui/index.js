@@ -7,3 +7,5 @@ export * from "./Spinner";
 export * from "./Modal";
 export * from "./TextArea";
 export * from "./TagButton";
+export * from "./AnswerCard";
+export * from "./Sidebar";

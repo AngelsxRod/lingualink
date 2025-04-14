@@ -38,7 +38,7 @@ export const Modal = ({ title, isOpen, onClose, children }) => {
           </div>
           <button
             onClick={onClose}
-            className="active:scale-95  text-rose-500 transition-colors duration-200 hover:text-rose-300"
+            className="active:scale-95 cursor-pointer text-rose-500 transition-colors duration-200 hover:text-rose-300"
           >
             <X className="w-6 h-6" />
           </button>
