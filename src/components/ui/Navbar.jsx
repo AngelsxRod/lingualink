@@ -23,7 +23,7 @@ export const Navbar = () => {
   return (
     <>
       {/* Navbar Desktop */}
-      <header className="sticky z-50 top-0 bg-black shadow-md">
+      <header className="sticky w-full z-50 top-0 left-0 bg-black shadow-md">
         <div className="mx-auto flex h-16 max-w-screen-xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="text-emerald-500">
             <img className="h-10" src={LogoImage} alt="Logo" />

@@ -5,6 +5,7 @@ import { useRegisterMutation } from "../../features/api/authApi";
 import toast from "react-hot-toast";
 import useNavigator from "../../hooks/useNavigator";
 
+
 const RegisterForm = () => {
   const methods = useForm();
   const { handleSubmit, reset } = methods;
@@ -19,6 +20,9 @@ const RegisterForm = () => {
       reset();
     } catch (error) {
       console.error("Error en el registro:", error);
+      toast.error(
+        error?.data?.message || "Error en el registro, intenta nuevamente."
+      );
     }
   };
 

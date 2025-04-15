@@ -3,7 +3,8 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://lingualink-api.vercel.app/",
+    baseUrl: "https://lingualink-api.vercel.app",
+    // baseUrl: "http://localhost:3000",
     prepareHeaders: (headers, { getState }) => {
       const token = getState().auth.token;
       if (token) {

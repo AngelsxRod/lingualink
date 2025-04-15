@@ -72,7 +72,7 @@ const Question = () => {
   const formattedDate = formatDate(data.createdAt);
 
   return (
-    <div className="max-w-6xl mx-auto bg-white pb-6">
+    <div className="max-w-6xl mx-auto bg-white p-4">
       <button
         onClick={() => navigate(-1)}
         className="flex items-center justify-center mb-4 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 cursor-pointer active:scale-95 transition-transform duration-100"

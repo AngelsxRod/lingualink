@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { Check, Menu, Funnel } from "lucide-react";
+import { Button } from "./Button";
 
 export const Sidebar = ({ tags, onFilterChange }) => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [sortOrder, setSortOrder] = useState("");
+  const [isOpen, setIsOpen] = useState(false); // Estado para controlar la visibilidad del Sidebar en móvil
 
   const handleTagChange = (tag) => {
     setSelectedTags((prev) =>
-      prev.includes(tag)
-        ? prev.filter((t) => t !== tag)
-        : [...prev, tag]
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
@@ -16,66 +17,105 @@ export const Sidebar = ({ tags, onFilterChange }) => {
     setSortOrder(order);
   };
 
+  const clearSortOrder = () => {
+    setSortOrder("");
+  };
+
   useEffect(() => {
-    onFilterChange({ tags: selectedTags, sortOrder });
-  }, [selectedTags, sortOrder, onFilterChange]);
+    onFilterChange({ tags: selectedTags, sortBy: sortOrder });
+  }, [selectedTags, sortOrder]);
 
   return (
-    <div className="">
-      <div className="fixed top-0 left-0 h-full bg-gray-100 shadow-lg z-40 w-64 p-4">
-        <h2 className="text-lg font-bold mb-4">Filtros</h2>
+    <>
+      {/* Botón para abrir/cerrar el Sidebar en móvil */}
+      <Button
+        className="py-2 fixed bottom-20 right-8 z-30 md:hidden"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <Funnel className="w-6 h-6" />
+      </Button>
+
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 left-0 h-screen w-64 bg-white text-gray-800 shadow-lg p-6 transform transition-transform duration-300 z-40 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0`}
+      >
+        <h2 className="text-xl font-bold mb-6">Filtros</h2>
 
         {/* Filtro por Tags */}
-        <div className="mb-4">
-          <h3 className="font-semibold mb-2">Filtrar por Tags</h3>
-          <ul className="space-y-2">
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-4">Tags</h3>
+          <ul className="space-y-3">
             {tags.map((tag) => (
               <li key={tag}>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    value={tag}
-                    onChange={() => handleTagChange(tag)}
-                    checked={selectedTags.includes(tag)}
-                  />
-                  <span>{tag}</span>
+                <label
+                  htmlFor={`check-${tag}`}
+                  className="flex items-center space-x-3 cursor-pointer"
+                >
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      value={tag}
+                      onChange={() => handleTagChange(tag)}
+                      id={`check-${tag}`}
+                      className="hidden peer"
+                    />
+
+                    <div className="w-6 h-6 border-2 border-gray-300 rounded-md peer-checked:border-emerald-500 peer-checked:bg-emerald-500 flex items-center justify-center">
+                      <Check className="w-full h-full text-white " />
+                    </div>
+                  </div>
+                  <span className="text-sm font-medium">{tag}</span>
                 </label>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Ordenar */}
+        {/* Filtro por Orden */}
         <div>
-          <h3 className="font-semibold mb-2">Ordenar por</h3>
-          <ul className="space-y-2">
-            <li>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name="sortOrder"
-                  value="mostSearched"
-                  onChange={() => handleSortChange("mostSearched")}
-                  checked={sortOrder === "mostSearched"}
-                />
-                <span>Más buscados</span>
-              </label>
-            </li>
-            <li>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name="sortOrder"
-                  value="leastSearched"
-                  onChange={() => handleSortChange("leastSearched")}
-                  checked={sortOrder === "leastSearched"}
-                />
-                <span>Menos buscados</span>
-              </label>
-            </li>
-          </ul>
+          <h3 className="text-lg font-semibold mb-4">Ordenar por</h3>
+          <div className="space-y-3">
+            <label className="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="radio"
+                name="sortOrder"
+                value="mostVoted"
+                checked={sortOrder === "mostVoted"}
+                onChange={() => handleSortChange("mostVoted")}
+                className="h-5 w-5 text-blue-600 bg-gray-100 border-gray-300 rounded-full focus:ring-2 focus:ring-blue-400"
+              />
+              <span className="text-sm font-medium">Más votados</span>
+            </label>
+            <label className="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="radio"
+                name="sortOrder"
+                value="leastVoted"
+                checked={sortOrder === "leastVoted"}
+                onChange={() => handleSortChange("leastVoted")}
+                className="h-5 w-5 text-blue-600 bg-gray-100 border-gray-300 rounded-full focus:ring-2 focus:ring-blue-400"
+              />
+              <span className="text-sm font-medium">Menos votados</span>
+            </label>
+          </div>
+          <button
+            onClick={clearSortOrder}
+            className="mt-2 text-sm text-blue-600 underline"
+          >
+            Limpiar selección
+          </button>
         </div>
       </div>
-    </div>
+
+      {/* Fondo oscuro al abrir el Sidebar en móvil */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setIsOpen(false)}
+        ></div>
+      )}
+    </>
   );
 };

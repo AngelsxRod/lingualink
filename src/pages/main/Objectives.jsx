@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 
 const Objectives = () => {
   return (
-    <div className="h-full bg-white text-gray-900 flex items-center justify-center">
+    <div className=" bg-white text-gray-900 flex items-center justify-center">
       <motion.div
-        className="max-w-5xl w-full bg-white p-12 rounded-2xl shadow-[0_3px_10px_rgb(0,0,0,0.2)] border border-gray-300 h-full"
+        className="max-w-5xl w-full bg-white p-12 rounded-2xl shadow-[0_3px_10px_rgb(0,0,0,0.2)] h-full border border-gray-300"
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}

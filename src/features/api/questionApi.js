@@ -3,7 +3,17 @@ import apiSlice from "./apiSlice";
 export const questionAPi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getQuestions: builder.query({
-      query: () => "/question",
+      query: ({
+        page,
+        pageSize,
+        tags,
+        sortBy,
+        positiveVotes,
+        negativeVotes,
+      }) => ({
+        url: "/question",
+        params: { page, pageSize, tags, sortBy, positiveVotes, negativeVotes },
+      }),
       providesTags: ["Questions"],
     }),
     getQuestionById: builder.query({
