@@ -1,22 +1,31 @@
 import { Question } from "#question";
 import { Answer } from "#answer";
+import { Tag } from "#tag";
 
-export const getQuestions = async (page = 1, pageSize = 10) => {
+export const getQuestions = async (filters = {}, page = 1, pageSize = 10) => {
   try {
     page = parseInt(page);
     pageSize = parseInt(pageSize);
-    const skip = (page - 1) * pageSize;
 
-    const questions = await Question.find({ status: true })
+    const query = { status: true };
+
+    if (filters.tags && filters.tags.length > 0) {
+      const tagIds = await Tag.find({ name: { $in: filters.tags } }).select(
+        "_id"
+      );
+      query.tags = { $in: tagIds.map((tag) => tag._id) };
+    }
+
+    // Obtener todas las preguntas sin paginar aún
+    const allQuestions = await Question.find(query)
       .populate("user", "username")
       .populate("tags", "name")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(pageSize)
+      .sort({ createdAt: -1 }) // orden predeterminado solo si no hay filtro por votos
       .lean();
 
-    const questionsWithAnswersCount = await Promise.all(
-      questions.map(async (question) => {
+    // Calcular votos y respuestas
+    const questionsWithVotes = await Promise.all(
+      allQuestions.map(async (question) => {
         const answersCount = await Answer.countDocuments({
           questionId: question._id,
         });
@@ -27,20 +36,33 @@ export const getQuestions = async (page = 1, pageSize = 10) => {
         const negativeVotes = question.votes.filter(
           (vote) => vote.vote === 0
         ).length;
+        const totalVotes = positiveVotes + negativeVotes;
 
         return {
           ...question,
           answersCount,
           positiveVotes,
           negativeVotes,
+          totalVotes,
         };
       })
     );
 
-    const totalQuestions = await Question.countDocuments({ status: true });
+    if (filters.sortBy === "mostVoted") {
+      questionsWithVotes.sort((a, b) => b.totalVotes - a.totalVotes);
+    } else if (filters.sortBy === "leastVoted") {
+      questionsWithVotes.sort((a, b) => a.totalVotes - b.totalVotes);
+    }
+
+    const totalQuestions = questionsWithVotes.length;
+
+    const paginatedQuestions = questionsWithVotes.slice(
+      (page - 1) * pageSize,
+      page * pageSize
+    );
 
     return {
-      questions: questionsWithAnswersCount,
+      questions: paginatedQuestions,
       pageSize,
       totalQuestions,
       totalPages: Math.ceil(totalQuestions / pageSize),

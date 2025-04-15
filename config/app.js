@@ -22,11 +22,7 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(
-  cors({
-    origin: "https://lingualink-app.vercel.app",
-  })
-);
+app.use(cors());
 
 app.use(helmet());
 app.use(morgan("dev"));

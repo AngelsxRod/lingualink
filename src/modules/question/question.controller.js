@@ -9,8 +9,15 @@ import {
 
 export const getQuestionsController = async (req, res) => {
   try {
-    const { page, pageSize } = req.query;
-    const questions = await getQuestions(page, pageSize);
+    const { page, pageSize, tags, sortBy, positiveVotes, negativeVotes } =
+      req.query;
+
+    const filters = {
+      tags: tags ? tags.split(",") : [],
+      sortBy,
+    };
+
+    const questions = await getQuestions(filters, page, pageSize);
     return res.json(questions);
   } catch (error) {
     return res.status(500).json({ message: error.message });
