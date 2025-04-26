@@ -1,6 +1,7 @@
 export * from "./fieldValidation.js";
 export * from "./jwtMiddleware.js";
 export * from "./permissionMiddleware.js";
+export * from "./upload.middleware.js";
 export * as permissionValidator from "./validators/permission.valdidators.js";
 export * as roleValidator from "./validators/role.validators.js";
 export *as userValidator from "./validators/user.valdidators.js";

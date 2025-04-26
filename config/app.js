@@ -11,6 +11,7 @@ import {
   permissionRoutes,
   roleRoutes,
   authRoutes,
+  resourceRoutes,
 } from "#modules";
 
 import ServerlessHttp from "serverless-http";
@@ -23,7 +24,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
-
 app.use(helmet());
 app.use(morgan("dev"));
 
@@ -35,6 +35,7 @@ app.use("/answer", answerRoutes.router);
 app.use("/permission", permissionRoutes.router);
 app.use("/role", roleRoutes.router);
 app.use("/auth", authRoutes.router);
+app.use("/resource", resourceRoutes.router);
 app.use("/test", (req, res) => {
   res.json({
     message: "Esta funcion es para pruebas",

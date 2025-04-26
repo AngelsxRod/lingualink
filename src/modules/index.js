@@ -5,3 +5,4 @@ export * as tagRoutes from "./tag/tag.routes.js";
 export * as userRoutes from "./user/user.routes.js";
 export * as roleRoutes from "./role/role.routes.js";
 export * as authRoutes from "./auth/auth.routes.js";
+export * as resourceRoutes from "./resource/resource.routes.js";
