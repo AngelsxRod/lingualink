@@ -1,9 +1,15 @@
+import fs from "fs"; // 👈 importar fs
 import multer from "multer";
 import path from "path";
 
+const uploadDir = "/tmp/upload";
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.resolve("upload"));
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir);
+    }
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
