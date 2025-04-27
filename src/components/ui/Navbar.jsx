@@ -33,15 +33,6 @@ export const Navbar = () => {
             <Link className="text-gray-300 hover:text-white" to="/">
               Inicio
             </Link>
-            <Link className="text-gray-300 hover:text-white" to="/about">
-              Acerca de nosotros
-            </Link>
-            <Link className="text-gray-300 hover:text-white" to="/objectives">
-              Objetivos
-            </Link>
-            <a className="text-gray-300 hover:text-white" href="#">
-              Servicios
-            </a>
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
