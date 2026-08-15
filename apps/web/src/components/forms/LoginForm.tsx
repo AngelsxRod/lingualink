@@ -1,15 +1,15 @@
 import { Lock, Mail } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Button, InputField } from "../ui";
-import { Link } from "react-router-dom";
+import type { LoginDto } from "@lingualink/shared";
 
 import useAuth from "../../hooks/useAuth";
 export const LoginForm = () => {
-  const methods = useForm();
+  const methods = useForm<LoginDto>();
   const { handleSubmit } = methods;
 
-  const { loginUser, isLoading, error } = useAuth();
-  const onSubmit = async (data) => {
+  const { loginUser, isLoading } = useAuth();
+  const onSubmit = async (data: LoginDto) => {
     await loginUser(data);
   };
   return (
@@ -57,7 +57,7 @@ export const LoginForm = () => {
           >
             {isLoading ? "Cargando..." : "Iniciar sesión"}
           </Button>
-          
+
         </div>
       </form>
     </FormProvider>

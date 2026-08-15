@@ -5,8 +5,27 @@ import { Button, TextArea } from "../ui/";
 import { useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 
-const AnswerForm = ({ defaultValues, OnEvent, actions, questionId }) => {
-  const methods = useForm({
+interface AnswerFormValues {
+  content: string;
+}
+
+interface FormActions {
+  isLoading?: boolean;
+  isError?: boolean;
+}
+
+interface AnswerFormProps {
+  defaultValues?: Partial<AnswerFormValues>;
+  OnEvent: (args: {
+    data: AnswerFormValues;
+    questionId: string;
+  }) => { unwrap: () => Promise<unknown> };
+  actions?: FormActions;
+  questionId: string;
+}
+
+const AnswerForm = ({ defaultValues, OnEvent, actions, questionId }: AnswerFormProps) => {
+  const methods = useForm<AnswerFormValues>({
     defaultValues: defaultValues || {},
   });
   const { handleSubmit, reset, setValue } = methods;
@@ -16,7 +35,7 @@ const AnswerForm = ({ defaultValues, OnEvent, actions, questionId }) => {
     reset(defaultValues);
   }, [defaultValues, reset]);
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: AnswerFormValues) => {
     try {
       await OnEvent({
         data,
@@ -27,13 +46,14 @@ const AnswerForm = ({ defaultValues, OnEvent, actions, questionId }) => {
         toast.success("Respuesta creada con éxito");
       }
     } catch (error) {
-      toast.error(error?.data?.message || "Error al crear la pregunta");
+      const err = error as { data?: { message?: string } };
+      toast.error(err?.data?.message || "Error al crear la pregunta");
     }
   };
 
-  const handleContentChange = (e) => {
+  const handleContentChange = () => {
     if (!isAuthenticated) {
-      setValue("content", ""); 
+      setValue("content", "");
       return;
     }
   };

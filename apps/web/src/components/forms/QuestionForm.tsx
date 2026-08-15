@@ -7,12 +7,31 @@ import useAuth from "../../hooks/useAuth";
 import useNavigator from "../../hooks/useNavigator";
 import { Button, InputField, Modal, Spinner, TagButton, TextArea } from "../ui";
 
-const QuestionForm = ({ isOpen, onClose, defaultValues, OnEvent, actions }) => {
-  const methods = useForm({
+interface QuestionFormValues {
+  title: string;
+  content: string;
+  tags: string[];
+}
+
+interface FormActions {
+  isLoading?: boolean;
+  isError?: boolean;
+}
+
+interface QuestionFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+  defaultValues?: Partial<QuestionFormValues>;
+  OnEvent: (data: QuestionFormValues) => { unwrap: () => Promise<unknown> };
+  actions?: FormActions;
+}
+
+const QuestionForm = ({ isOpen, onClose, defaultValues, OnEvent, actions }: QuestionFormProps) => {
+  const methods = useForm<QuestionFormValues>({
     defaultValues: defaultValues || {},
   });
   const { handleSubmit, reset } = methods;
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 4;
   const { isAuthenticated } = useAuth();
@@ -22,7 +41,7 @@ const QuestionForm = ({ isOpen, onClose, defaultValues, OnEvent, actions }) => {
     onClose();
   };
 
-  const handleClick = (tag) => {
+  const handleClick = (tag: string) => {
     setSelectedTags((prevSelectedTags) =>
       prevSelectedTags.includes(tag)
         ? prevSelectedTags.filter((t) => t !== tag)
@@ -33,19 +52,18 @@ const QuestionForm = ({ isOpen, onClose, defaultValues, OnEvent, actions }) => {
   const { data: tagsData } = useGetTagsQuery({ page: currentPage, pageSize });
 
   const handleNextPage = () => {
-    console.log(tagsData?.currentPage < tagsData?.totalPages);
-    if (tagsData?.currentPage < tagsData?.totalPages) {
+    if (tagsData && tagsData.currentPage < tagsData.totalPages) {
       setCurrentPage((prevPage) => prevPage + 1);
     }
   };
 
   const handlePreviousPage = () => {
-    if (tagsData?.currentPage > 1) {
+    if (tagsData && tagsData.currentPage > 1) {
       setCurrentPage((prevPage) => prevPage - 1);
     }
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: QuestionFormValues) => {
     if (!isAuthenticated) {
       toast.error("Debes iniciar sesión para realizar esta acción.");
       goTo("/auth/login");
@@ -59,7 +77,8 @@ const QuestionForm = ({ isOpen, onClose, defaultValues, OnEvent, actions }) => {
         handleClose();
       }
     } catch (error) {
-      toast.error(error?.data?.message || "Error al crear la pregunta");
+      const err = error as { data?: { message?: string } };
+      toast.error(err?.data?.message || "Error al crear la pregunta");
     }
   };
 
@@ -128,7 +147,7 @@ const QuestionForm = ({ isOpen, onClose, defaultValues, OnEvent, actions }) => {
                   <button
                     type="button"
                     onClick={handleNextPage}
-                    disabled={tagsData?.currentPage >= tagsData?.totalPages}
+                    disabled={!tagsData || tagsData.currentPage >= tagsData.totalPages}
                     className="cursor-pointer disabled:cursor-not-allowed disabled:text-black flex w-8 h-8 mx-1 justify-center items-center rounded-full border border-gray-200 bg-white text-emerald-300 hover:border-gray-300 disabled:opacity-50"
                   >
                     <ChevronRight />

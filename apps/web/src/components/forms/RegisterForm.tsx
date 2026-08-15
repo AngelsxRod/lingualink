@@ -1,18 +1,22 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { Button, InputField } from "../ui";
 import { Mail, Lock, User, Contact } from "lucide-react";
+import type { RegisterDto } from "@lingualink/shared";
 import { useRegisterMutation } from "../../features/api/authApi";
 import toast from "react-hot-toast";
 import useNavigator from "../../hooks/useNavigator";
 
+interface RegisterFormValues extends RegisterDto {
+  confirmPassword: string;
+}
 
 const RegisterForm = () => {
-  const methods = useForm();
+  const methods = useForm<RegisterFormValues>();
   const { handleSubmit, reset } = methods;
   const [register, { isLoading }] = useRegisterMutation();
   const { goTo } = useNavigator();
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: RegisterFormValues) => {
     try {
       await register(data).unwrap();
       toast.success("¡Registro exitoso!");
@@ -20,8 +24,9 @@ const RegisterForm = () => {
       reset();
     } catch (error) {
       console.error("Error en el registro:", error);
+      const err = error as { data?: { message?: string } };
       toast.error(
-        error?.data?.message || "Error en el registro, intenta nuevamente."
+        err?.data?.message || "Error en el registro, intenta nuevamente."
       );
     }
   };
