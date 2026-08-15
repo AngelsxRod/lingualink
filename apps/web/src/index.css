@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@theme {
+  --spacing-full-screen: calc(100vh - 64px);
+  --color-black: rgb(10, 10, 13);
+}
