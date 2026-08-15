@@ -1,34 +1,17 @@
-import { Schema, model, type HydratedDocument } from "mongoose";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument } from "mongoose";
 
-export interface PermissionDocument {
-  name: string;
-  description: string;
-  status: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+@Schema({ timestamps: true, versionKey: false })
+export class Permission {
+  @Prop({ type: String, required: true, unique: true })
+  name!: string;
+
+  @Prop({ type: String, required: true })
+  description!: string;
+
+  @Prop({ type: Boolean, default: true })
+  status!: boolean;
 }
 
-const permissionSchema = new Schema<PermissionDocument>(
-  {
-    name: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
-    status: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  {
-    timestamps: true,
-    versionKey: false,
-  }
-);
-
-export const Permission = model<PermissionDocument>("Permission", permissionSchema);
-export type PermissionHydratedDocument = HydratedDocument<PermissionDocument>;
+export type PermissionDocument = HydratedDocument<Permission>;
+export const PermissionSchema = SchemaFactory.createForClass(Permission);

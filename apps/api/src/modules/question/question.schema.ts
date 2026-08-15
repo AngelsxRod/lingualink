@@ -1,67 +1,37 @@
-import { Schema, model, type HydratedDocument, type Types } from "mongoose";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument, Types } from "mongoose";
+import { Tag } from "../tag/tag.schema";
+import { User } from "../user/user.schema";
 
-export interface QuestionVote {
-  userId: Types.ObjectId;
-  vote: 0 | 1;
+@Schema({ _id: false })
+export class QuestionVote {
+  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
+  userId!: Types.ObjectId;
+
+  @Prop({ type: Number, enum: [0, 1] })
+  vote!: 0 | 1;
 }
 
-export interface QuestionDocument {
-  title: string;
-  content: string;
-  user: Types.ObjectId;
-  tags: Types.ObjectId[];
-  votes: QuestionVote[];
-  status: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+@Schema({ timestamps: true, versionKey: false })
+export class Question {
+  @Prop({ type: String, required: true })
+  title!: string;
+
+  @Prop({ type: String, required: true })
+  content!: string;
+
+  @Prop({ type: Types.ObjectId, ref: User.name })
+  user!: Types.ObjectId;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: Tag.name }] })
+  tags!: Types.ObjectId[];
+
+  @Prop({ type: [QuestionVote], default: [] })
+  votes!: QuestionVote[];
+
+  @Prop({ type: Boolean, default: true })
+  status!: boolean;
 }
 
-const questionSchema = new Schema<QuestionDocument>(
-  {
-    title: {
-      type: String,
-      required: true,
-    },
-    content: {
-      type: String,
-      required: true,
-    },
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-    tags: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Tag",
-      },
-    ],
-    votes: {
-      type: [
-        {
-          userId: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-          },
-          vote: {
-            type: Number,
-            enum: [0, 1],
-          },
-        },
-      ],
-      default: [],
-    },
-    status: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  {
-    timestamps: true,
-    versionKey: false,
-  }
-);
-
-export const Question = model<QuestionDocument>("Question", questionSchema);
-export type QuestionHydratedDocument = HydratedDocument<QuestionDocument>;
+export type QuestionDocument = HydratedDocument<Question>;
+export const QuestionSchema = SchemaFactory.createForClass(Question);

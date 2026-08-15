@@ -1,33 +1,17 @@
-import { Schema, model, type HydratedDocument } from "mongoose";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument } from "mongoose";
 
-export interface TagDocument {
-  name: string;
+@Schema({ timestamps: true, versionKey: false })
+export class Tag {
+  @Prop({ type: String, required: true, unique: true })
+  name!: string;
+
+  @Prop({ type: String })
   description?: string;
-  status: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+
+  @Prop({ type: Boolean, default: true })
+  status!: boolean;
 }
 
-const tagSchema = new Schema<TagDocument>(
-  {
-    name: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    description: {
-      type: String,
-    },
-    status: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  {
-    timestamps: true,
-    versionKey: false,
-  }
-);
-
-export const Tag = model<TagDocument>("Tag", tagSchema);
-export type TagHydratedDocument = HydratedDocument<TagDocument>;
+export type TagDocument = HydratedDocument<Tag>;
+export const TagSchema = SchemaFactory.createForClass(Tag);

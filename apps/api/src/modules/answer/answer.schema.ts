@@ -1,58 +1,36 @@
-import { Schema, model, type HydratedDocument, type Types } from "mongoose";
-import type { QuestionVote } from "#question";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument, Types } from "mongoose";
+import { Question } from "../question/question.schema";
+import { User } from "../user/user.schema";
 
-export interface AnswerDocument {
-  questionId: Types.ObjectId;
-  user: Types.ObjectId;
-  content: string;
-  votes: QuestionVote[];
-  status: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+@Schema({ _id: false })
+export class AnswerVote {
+  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
+  userId!: Types.ObjectId;
+
+  @Prop({ type: Number, enum: [0, 1] })
+  vote!: 0 | 1;
 }
 
-const asnwerSchema = new Schema<AnswerDocument>(
-  {
-    questionId: {
-      type: Schema.Types.ObjectId,
-      required: true,
-    },
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    content: {
-      type: String,
-      required: true,
-    },
-    votes: {
-      type: [
-        {
-          userId: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-          },
-          vote: {
-            type: Number,
-            enum: [0, 1],
-          },
-        },
-      ],
+@Schema({ timestamps: true, versionKey: false })
+export class Answer {
+  // Bug corregido respecto a la versión Express: aquí sí lleva `ref: Question.name`,
+  // por lo que .populate("questionId") funciona (antes no tenía ref y el populate fallaba).
+  @Prop({ type: Types.ObjectId, ref: Question.name, required: true })
+  questionId!: Types.ObjectId;
 
-      default: [],
-    },
-    status: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  {
-    timestamps: true,
-    versionKey: false,
-  }
-);
+  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
+  user!: Types.ObjectId;
 
-export const Answer = model<AnswerDocument>("Answer", asnwerSchema);
-export type AnswerHydratedDocument = HydratedDocument<AnswerDocument>;
+  @Prop({ type: String, required: true })
+  content!: string;
+
+  @Prop({ type: [AnswerVote], default: [] })
+  votes!: AnswerVote[];
+
+  @Prop({ type: Boolean, default: true })
+  status!: boolean;
+}
+
+export type AnswerDocument = HydratedDocument<Answer>;
+export const AnswerSchema = SchemaFactory.createForClass(Answer);

@@ -1,59 +1,36 @@
-import { Schema, model, type HydratedDocument, type Types } from "mongoose";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument, Types } from "mongoose";
+import { User } from "../user/user.schema";
 
-export interface ResourceRating {
-  userId: Types.ObjectId;
-  rating: 1 | 2 | 3 | 4 | 5;
+@Schema({ _id: false })
+export class ResourceRating {
+  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
+  userId!: Types.ObjectId;
+
+  @Prop({ type: Number, enum: [1, 2, 3, 4, 5] })
+  rating!: 1 | 2 | 3 | 4 | 5;
 }
 
-export interface ResourceDocument {
-  title: string;
-  filePath: string;
-  downloads: number;
-  views: number;
-  ratings: ResourceRating[];
-  createdAt: Date;
-  updatedAt: Date;
+@Schema({ timestamps: true, versionKey: false, collection: "resources" })
+export class Resource {
+  @Prop({ type: String, required: true })
+  title!: string;
+
+  @Prop({ type: String })
+  description?: string;
+
+  @Prop({ type: String, required: true })
+  filePath!: string;
+
+  @Prop({ type: Number, default: 0 })
+  downloads!: number;
+
+  @Prop({ type: Number, default: 0 })
+  views!: number;
+
+  @Prop({ type: [ResourceRating], default: [] })
+  ratings!: ResourceRating[];
 }
 
-const resourcesSchema = new Schema<ResourceDocument>(
-  {
-    title: {
-      type: String,
-      required: true,
-    },
-    filePath: {
-      type: String,
-      required: true,
-    },
-    downloads: {
-      type: Number,
-      default: 0,
-    },
-    views: {
-      type: Number,
-      default: 0,
-    },
-    ratings: {
-      type: [
-        {
-          userId: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-          },
-          rating: {
-            type: Number,
-            enum: [1, 2, 3, 4, 5],
-          },
-        },
-      ],
-      default: [],
-    },
-  },
-  {
-    timestamps: true,
-    versionKey: false,
-  }
-);
-export const Resources = model<ResourceDocument>("Resources", resourcesSchema);
-export type ResourceHydratedDocument = HydratedDocument<ResourceDocument>;
+export type ResourceDocument = HydratedDocument<Resource>;
+export const ResourceSchema = SchemaFactory.createForClass(Resource);

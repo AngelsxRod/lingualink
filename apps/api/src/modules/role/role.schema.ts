@@ -1,43 +1,21 @@
-import { Schema, model, type HydratedDocument, type Types } from "mongoose";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument, Types } from "mongoose";
+import { Permission } from "../permission/permission.schema";
 
-export interface RoleDocument {
-  name: string;
-  description: string;
-  permissions: Types.ObjectId[];
-  status: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+@Schema({ autoCreate: true, timestamps: true, versionKey: false })
+export class Role {
+  @Prop({ type: String, required: true, unique: true })
+  name!: string;
+
+  @Prop({ type: String, required: true })
+  description!: string;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: Permission.name }], default: [] })
+  permissions!: Types.ObjectId[];
+
+  @Prop({ type: Boolean, default: true })
+  status!: boolean;
 }
 
-const roleSchema = new Schema<RoleDocument>(
-  {
-    name: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
-    permissions: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Permission",
-        default: [],
-      },
-    ],
-    status: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  {
-    autoCreate: true,
-    timestamps: true,
-    versionKey: false,
-  }
-);
-
-export const Role = model<RoleDocument>("Role", roleSchema);
-export type RoleHydratedDocument = HydratedDocument<RoleDocument>;
+export type RoleDocument = HydratedDocument<Role>;
+export const RoleSchema = SchemaFactory.createForClass(Role);
