@@ -13,8 +13,8 @@ export const validateQuestionExists = async (id: string) => {
 
 export const validateUserHasNotVoted = async (id: string, userId: string) => {
   const question = await Question.findById(id);
-  const existingVote = question.votes.find(
-    (v: { userId: { toString(): string } }) => v.userId.toString() === userId
+  const existingVote = question!.votes.find(
+    (v) => v.userId.toString() === userId
   );
   if (existingVote) {
     throw new Error("Ya has votado en esta pregunta");
@@ -74,8 +74,8 @@ export const VoteQuestionValidators = [
   check("id", "El id es obligatorio").notEmpty(),
   check("id", "El id no es válido").isMongoId(),
   check("id").custom(validateQuestionExists),
-  check("id").custom(async (id, { req }) => {
-    await validateUserHasNotVoted(id, req.user.id);
+  check("id").custom(async (id: string, { req }: Meta) => {
+    await validateUserHasNotVoted(id, req.user!.id);
   }),
   check("vote", "El voto es obligatorio").notEmpty(),
   check("vote", "El voto debe ser 0 o 1").isIn([0, 1]),

@@ -13,8 +13,8 @@ export const validateAnswerExists = async (id: string) => {
 
 export const validateUserHasNotVoted = async (id: string, userId: string) => {
   const answer = await Answer.findById(id);
-  const existingVote = answer.votes.find(
-    (v: { userId: { toString(): string } }) => v.userId.toString() === userId
+  const existingVote = answer!.votes.find(
+    (v) => v.userId.toString() === userId
   );
   if (existingVote) {
     throw new Error("Ya has votado en esta respuesta");

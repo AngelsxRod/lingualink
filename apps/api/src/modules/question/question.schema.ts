@@ -1,6 +1,22 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, type HydratedDocument, type Types } from "mongoose";
 
-const questionSchema = new Schema(
+export interface QuestionVote {
+  userId: Types.ObjectId;
+  vote: 0 | 1;
+}
+
+export interface QuestionDocument {
+  title: string;
+  content: string;
+  user: Types.ObjectId;
+  tags: Types.ObjectId[];
+  votes: QuestionVote[];
+  status: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const questionSchema = new Schema<QuestionDocument>(
   {
     title: {
       type: String,
@@ -47,4 +63,5 @@ const questionSchema = new Schema(
   }
 );
 
-export const Question = model("Question", questionSchema);
+export const Question = model<QuestionDocument>("Question", questionSchema);
+export type QuestionHydratedDocument = HydratedDocument<QuestionDocument>;

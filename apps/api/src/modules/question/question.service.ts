@@ -1,13 +1,25 @@
 import { Question } from "#question";
 import { Answer } from "#answer";
 import { Tag } from "#tag";
+import type { FilterQuery, Types } from "mongoose";
+import type { QuestionDocument } from "./question.schema.js";
+import type { CreateQuestionDto } from "@lingualink/shared";
 
-export const getQuestions = async (filters = {}, page = 1, pageSize = 10) => {
+interface QuestionFilters {
+  tags?: string[];
+  sortBy?: string;
+}
+
+export const getQuestions = async (
+  filters: QuestionFilters = {},
+  page: number | string = 1,
+  pageSize: number | string = 10
+) => {
   try {
-    page = parseInt(page);
-    pageSize = parseInt(pageSize);
+    const currentPage = Number(page);
+    const currentPageSize = Number(pageSize);
 
-    const query = { status: true };
+    const query: FilterQuery<QuestionDocument> = { status: true };
 
     if (filters.tags && filters.tags.length > 0) {
       const tagIds = await Tag.find({ name: { $in: filters.tags } }).select(
@@ -57,23 +69,23 @@ export const getQuestions = async (filters = {}, page = 1, pageSize = 10) => {
     const totalQuestions = questionsWithVotes.length;
 
     const paginatedQuestions = questionsWithVotes.slice(
-      (page - 1) * pageSize,
-      page * pageSize
+      (currentPage - 1) * currentPageSize,
+      currentPage * currentPageSize
     );
 
     return {
       questions: paginatedQuestions,
-      pageSize,
+      pageSize: currentPageSize,
       totalQuestions,
-      totalPages: Math.ceil(totalQuestions / pageSize),
-      currentPage: page,
+      totalPages: Math.ceil(totalQuestions / currentPageSize),
+      currentPage,
     };
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error((error as Error).message);
   }
 };
 
-export const getQuestionById = async (id) => {
+export const getQuestionById = async (id: string) => {
   try {
     const question = await Question.findById(id)
       .populate("user", "username")
@@ -102,30 +114,31 @@ export const getQuestionById = async (id) => {
       negativeVotes,
     };
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error((error as Error).message);
   }
 };
-export const createQuestion = async (data) => {
+
+export const createQuestion = async (data: CreateQuestionDto & { user: string }) => {
   console.log("🚀 ~ createQuestion ~ data:", data);
   try {
     const question = new Question(data);
     await question.save();
     return question;
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error((error as Error).message);
   }
 };
 
-export const updateQuestion = async (id, data) => {
+export const updateQuestion = async (id: string, data: Partial<CreateQuestionDto>) => {
   try {
     const question = await Question.findByIdAndUpdate(id, data, { new: true });
     return question;
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error((error as Error).message);
   }
 };
 
-export const deleteQuestion = async (id) => {
+export const deleteQuestion = async (id: string) => {
   try {
     const question = await Question.findByIdAndUpdate(
       id,
@@ -134,11 +147,17 @@ export const deleteQuestion = async (id) => {
     );
     return question;
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error((error as Error).message);
   }
 };
 
-export const voteQuestion = async (data) => {
+interface VoteQuestionInput {
+  id: string;
+  userId: string;
+  vote: 0 | 1;
+}
+
+export const voteQuestion = async (data: VoteQuestionInput) => {
   try {
     const question = await Question.findById(data.id);
 
@@ -153,12 +172,12 @@ export const voteQuestion = async (data) => {
     if (existingVoteIndex !== -1) {
       question.votes[existingVoteIndex].vote = data.vote;
     } else {
-      question.votes.push({ userId: data.userId, vote: data.vote });
+      question.votes.push({ userId: data.userId as unknown as Types.ObjectId, vote: data.vote });
     }
 
     const updatedQuestion = await question.save();
     return updatedQuestion;
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error((error as Error).message);
   }
 };
