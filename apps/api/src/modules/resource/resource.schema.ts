@@ -1,6 +1,21 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, type HydratedDocument, type Types } from "mongoose";
 
-const resourcesSchema = new Schema(
+export interface ResourceRating {
+  userId: Types.ObjectId;
+  rating: 1 | 2 | 3 | 4 | 5;
+}
+
+export interface ResourceDocument {
+  title: string;
+  filePath: string;
+  downloads: number;
+  views: number;
+  ratings: ResourceRating[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const resourcesSchema = new Schema<ResourceDocument>(
   {
     title: {
       type: String,
@@ -40,4 +55,5 @@ const resourcesSchema = new Schema(
     versionKey: false,
   }
 );
-export const Resources = model("Resources", resourcesSchema);
+export const Resources = model<ResourceDocument>("Resources", resourcesSchema);
+export type ResourceHydratedDocument = HydratedDocument<ResourceDocument>;

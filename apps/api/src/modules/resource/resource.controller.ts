@@ -1,3 +1,4 @@
+import type { Request, Response } from "express";
 import { put } from "@vercel/blob";
 import {
   createResource,
@@ -5,7 +6,7 @@ import {
   getResourceById,
 } from "#resource";
 
-export const addResource = async (req, res) => {
+export const addResource = async (req: Request, res: Response) => {
   try {
     const { title, description } = req.body;
     const file = req.file;
@@ -32,7 +33,7 @@ export const addResource = async (req, res) => {
   }
 };
 
-export const listAllResources = async (req, res) => {
+export const listAllResources = async (req: Request, res: Response) => {
   try {
     const resources = await getAllResources();
     res.status(200).json(resources);
@@ -41,7 +42,7 @@ export const listAllResources = async (req, res) => {
   }
 };
 
-export const getResource = async (req, res) => {
+export const getResource = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const resource = await getResourceById(id);
