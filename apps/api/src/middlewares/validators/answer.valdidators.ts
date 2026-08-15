@@ -29,10 +29,7 @@ export const validateUserIsOwner = async (id: string, { req }: Meta) => {
     throw new Error("La respuesta no existe");
   }
 
-  // TODO: bug preexistente — el schema de Answer no tiene campo `userId` (es
-  // `user`), asi que esto siempre lanza TypeError en runtime hoy. Se preserva
-  // el comportamiento actual a proposito; se corrige en un commit fix aparte.
-  if ((answer as unknown as { userId: { toString(): string } }).userId.toString() !== req.user!.id) {
+  if (answer.user.toString() !== req.user!.id) {
     throw new Error("Solo puedes editar/eliminar tus respuestas");
   }
 
@@ -72,10 +69,7 @@ export const VoteAnswerValidators = [
   check("id", "El id no es válido").isMongoId(),
   check("id").custom(validateAnswerExists),
   check("id").custom(async (id: string, { req }: Meta) => {
-    // TODO: bug preexistente — deberia ser req.user.id, no req.userId (siempre
-    // undefined). Se preserva el comportamiento actual a proposito; se
-    // corrige en un commit fix aparte.
-    await validateUserHasNotVoted(id, (req as unknown as { userId?: string }).userId as string);
+    await validateUserHasNotVoted(id, req.user!.id);
   }),
   check("vote", "El voto es obligatorio").notEmpty(),
   check("vote", "El voto debe ser un número").isNumeric(),
