@@ -1,9 +1,9 @@
-import { check } from "express-validator";
+import { check, type Meta } from "express-validator";
 import { User } from "#user";
 import zxcvbn from "zxcvbn";
 import { roleValidator, validateFields } from "#middleware";
 
-export const validateUserEmailUnique = async (email) => {
+export const validateUserEmailUnique = async (email: string) => {
   const user = await User.findOne({ email });
   if (user) {
     throw new Error("El email ya está registrado");
@@ -11,7 +11,7 @@ export const validateUserEmailUnique = async (email) => {
   return true;
 };
 
-export const validateUserUsernameExists = async (username) => {
+export const validateUserUsernameExists = async (username: string) => {
   const user = await User.findOne({ username });
   if (user) {
     throw new Error("El username ya está registrado");
@@ -19,7 +19,7 @@ export const validateUserUsernameExists = async (username) => {
   return true;
 };
 
-export const validateUserExists = async (id) => {
+export const validateUserExists = async (id: string) => {
   const user = await User.findById(id);
   if (!user) {
     throw new Error("El usuario no existe");
@@ -27,7 +27,7 @@ export const validateUserExists = async (id) => {
   return true;
 };
 
-export const validatePasswordStrength = (password) => {
+export const validatePasswordStrength = (password: string) => {
   const { score } = zxcvbn(password);
   if (score < 2) {
     throw new Error("La contraseña es muy débil");
@@ -35,7 +35,7 @@ export const validatePasswordStrength = (password) => {
   return true;
 };
 
-export const validatePasswordMatch = (password, { req }) => {
+export const validatePasswordMatch = (password: string, { req }: Meta) => {
   if (password !== req.body.confirmPassword) {
     throw new Error("Las contraseñas no coinciden");
   }

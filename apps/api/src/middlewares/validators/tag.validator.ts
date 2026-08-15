@@ -1,9 +1,8 @@
-"use strict";
 import { Tag } from "#tag";
-import { check } from "express-validator";
+import { check, type Meta } from "express-validator";
 import { validateFields } from "#middleware";
 
-export const validateTagsExist = async (tags) => {
+export const validateTagsExist = async (tags?: string[]) => {
   if (tags && tags.length > 0) {
     for (const tagId of tags) {
       await validateTagExists(tagId);
@@ -12,7 +11,7 @@ export const validateTagsExist = async (tags) => {
   return true;
 };
 
-export const validateTagUnique = async (name) => {
+export const validateTagUnique = async (name: string) => {
   const tag = await Tag.findOne({ name });
   if (tag) {
     throw new Error("La etiqueta ya existe");
@@ -20,14 +19,14 @@ export const validateTagUnique = async (name) => {
   return true;
 };
 
-export const validateTagExists = async (id) => {
+export const validateTagExists = async (id: string) => {
   const tag = await Tag.findById(id);
   if (!tag) {
     throw new Error(`La etiqueta no existe ${id}`);
   }
   return true;
 };
-export const validateTagUniqueForUpdate = async (name, id) => {
+export const validateTagUniqueForUpdate = async (name: string, id: string) => {
   const tag = await Tag.findOne({ name });
   if (tag && tag.id !== id) {
     throw new Error("La etiqueta ya existe");
@@ -57,8 +56,8 @@ export const UpdateTagValidators = [
   check("name", "El nombre debe tener al menos 3 caracteres")
     .optional()
     .isLength({ min: 3 })
-    .custom(async (name, { req }) => {
-      await validateTagUniqueForUpdate(name, req.params.id);
+    .custom(async (name: string, { req }: Meta) => {
+      await validateTagUniqueForUpdate(name, req.params!.id);
       return true;
     }),
   check("description").optional().isString(),

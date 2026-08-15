@@ -1,8 +1,8 @@
 import { permissionValidator, validateFields } from "#middleware";
 import { Role } from "#role";
-import { check } from "express-validator";
+import { check, type Meta } from "express-validator";
 
-export const validateRoleUnique = async (name) => {
+export const validateRoleUnique = async (name: string) => {
   const role = await Role.findOne({ name });
   if (role) {
     throw new Error("El rol ya existe");
@@ -10,7 +10,7 @@ export const validateRoleUnique = async (name) => {
   return true;
 };
 
-export const validateRoleExists = async (id) => {
+export const validateRoleExists = async (id: string) => {
   const role = await Role.findById(id);
   if (!role) {
     throw new Error("El rol no existe");
@@ -18,7 +18,7 @@ export const validateRoleExists = async (id) => {
   return true;
 };
 
-export const validateRoleUniqueForUpdate = async (name, id) => {
+export const validateRoleUniqueForUpdate = async (name: string, id: string) => {
   const role = await Role.findOne({ name });
   if (role && role.id !== id) {
     throw new Error("El rol ya existe");
@@ -57,8 +57,8 @@ export const UpdateRoleValidators = [
   check("name", "El nombre debe tener al menos 3 caracteres")
     .optional()
     .isLength({ min: 3 })
-    .custom(async (name, { req }) => {
-      await validateRoleUniqueForUpdate(name, req.params.id);
+    .custom(async (name: string, { req }: Meta) => {
+      await validateRoleUniqueForUpdate(name, req.params!.id);
       return true;
     }),
   check("description", "La descripción debe tener al menos 3 caracteres")

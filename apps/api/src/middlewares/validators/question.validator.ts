@@ -1,9 +1,9 @@
 import { Question } from "#question";
-import { check } from "express-validator";
+import { check, type Meta } from "express-validator";
 import { validateFields } from "#middleware";
-import { userValidator, tagValidator } from "#middleware";
+import { tagValidator } from "#middleware";
 
-export const validateQuestionExists = async (id) => {
+export const validateQuestionExists = async (id: string) => {
   const question = await Question.findById(id);
   if (!question) {
     throw new Error("La pregunta no existe");
@@ -11,10 +11,10 @@ export const validateQuestionExists = async (id) => {
   return true;
 };
 
-export const validateUserHasNotVoted = async (id, userId) => {
+export const validateUserHasNotVoted = async (id: string, userId: string) => {
   const question = await Question.findById(id);
   const existingVote = question.votes.find(
-    (v) => v.userId.toString() === userId
+    (v: { userId: { toString(): string } }) => v.userId.toString() === userId
   );
   if (existingVote) {
     throw new Error("Ya has votado en esta pregunta");
@@ -22,18 +22,17 @@ export const validateUserHasNotVoted = async (id, userId) => {
   return true;
 };
 
-
 //Consulta para validar que el usuario pueda actualizar solo sus preguntas
-export const validateUserIsOwner = async (id, { req }) => {
+export const validateUserIsOwner = async (id: string, { req }: Meta) => {
   const question = await Question.findById(id);
   if (!question) {
     throw new Error("La pregunta no existe");
   }
-  
-  if (question.user.toString() !== req.user.id) {
+
+  if (question.user.toString() !== req.user!.id) {
     throw new Error("Solo puedes editar/eliminar tus preguntas");
   }
-  
+
   return true;
 };
 

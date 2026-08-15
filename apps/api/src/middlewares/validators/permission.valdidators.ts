@@ -1,8 +1,8 @@
-import { check } from "express-validator";
+import { check, type Meta } from "express-validator";
 import { Permission } from "#permission";
 import { validateFields } from "#middleware";
 
-export const validatePermissionUnique = async (name) => {
+export const validatePermissionUnique = async (name: string) => {
   const permission = await Permission.findOne({ name });
   if (permission) {
     throw new Error("El permiso ya existe");
@@ -10,7 +10,7 @@ export const validatePermissionUnique = async (name) => {
   return true;
 };
 
-export const validatePermissionExists = async (id) => {
+export const validatePermissionExists = async (id: string) => {
   const permission = await Permission.findById(id);
   if (!permission) {
     throw new Error(`El permiso ${id} no existe`);
@@ -18,14 +18,14 @@ export const validatePermissionExists = async (id) => {
   return true;
 };
 
-export const validatePermissionUniqueForUpdate = async (name, id) => {
+export const validatePermissionUniqueForUpdate = async (name: string, id: string) => {
   const permission = await Permission.findOne({ name });
   if (permission && permission.id !== id) {
     throw new Error("El permiso ya existe");
   }
 };
 
-export const validatePermissionsExist = async (permissions) => {
+export const validatePermissionsExist = async (permissions?: string[]) => {
   if (permissions && permissions.length > 0) {
     for (const permissionId of permissions) {
       await validatePermissionExists(permissionId);
@@ -57,8 +57,8 @@ export const UpdatePermissionValidators = [
   check("name", "El nombre debe tener al menos 3 caracteres")
     .optional()
     .isLength({ min: 3 })
-    .custom(async (name, { req }) => {
-      await validatePermissionUniqueForUpdate(name, req.params.id);
+    .custom(async (name: string, { req }: Meta) => {
+      await validatePermissionUniqueForUpdate(name, req.params!.id);
       return true;
     }),
   check("description", "La descripción debe tener al menos 3 caracteres")
