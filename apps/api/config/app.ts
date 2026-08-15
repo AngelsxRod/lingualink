@@ -1,5 +1,5 @@
 import cors from "cors";
-import express from "express";
+import express, { type Express, type Request, type Response } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import config from "./config.js";
@@ -14,7 +14,7 @@ import {
   resourceRoutes,
 } from "#modules";
 
-const app = express();
+const app: Express = express();
 const port = config.port || 2656;
 // Middlewares
 app.use(express.json());
@@ -44,7 +44,7 @@ app.use("/permission", permissionRoutes.router);
 app.use("/role", roleRoutes.router);
 app.use("/auth", authRoutes.router);
 app.use("/resource", resourceRoutes.router);
-app.use("/test", (req, res) => {
+app.use("/test", (req: Request, res: Response) => {
   res.json({
     message: "Esta funcion es para pruebas",
   });

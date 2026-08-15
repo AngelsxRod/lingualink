@@ -10,7 +10,13 @@ if (isProd && !process.env.MONGO_URI) {
   throw new Error("MONGO_URI es requerido en producción");
 }
 
-const config = {
+interface Config {
+  port: string | number;
+  mongo_uri: string;
+  jwtSecret: string;
+}
+
+const config: Config = {
   port: process.env.PORT || 3000,
   mongo_uri: process.env.MONGO_URI || "mongodb://localhost:27017/basedata",
   jwtSecret: process.env.JWT_SECRET || "supersecretkey",

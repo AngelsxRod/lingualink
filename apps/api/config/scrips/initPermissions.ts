@@ -4,14 +4,11 @@ import { Role } from "#role";
 import permissionsList from "../permissions.js";
 import mongoose from "mongoose";
 
-const initPermissions = async () => {
+const initPermissions = async (): Promise<void> => {
   try {
-    await mongoose.connect(config.mongo_uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(config.mongo_uri);
 
-    let permissionIds = [];
+    const permissionIds: mongoose.Types.ObjectId[] = [];
     for (const perm of permissionsList) {
       let existingPermission = await Permission.findOne({ name: perm.name });
       if (!existingPermission) {

@@ -1,6 +1,17 @@
-import mongoose from "mongoose";
+import mongoose, { type Connection } from "mongoose";
 import config from "./config.js";
 import initPermissions from "./scrips/initPermissions.js";
+
+interface CachedConnection {
+  conn: Connection | null;
+  promise: Promise<Connection> | null;
+  permissionsSeeded: boolean;
+}
+
+declare global {
+   
+  var _mongooseConn: CachedConnection | undefined;
+}
 
 let cached = globalThis._mongooseConn;
 if (!cached) {
@@ -11,7 +22,7 @@ if (!cached) {
   };
 }
 
-export const connectToDatabase = async () => {
+export const connectToDatabase = async (): Promise<Connection> => {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
@@ -33,15 +44,16 @@ export const connectToDatabase = async () => {
         serverSelectionTimeoutMS: 5000,
         maxPoolSize: 10,
       })
-      .then((m) => m);
+      .then((m) => m.connection);
   }
 
-  cached.conn = await cached.promise;
+  const conn = await cached.promise;
+  cached.conn = conn;
 
   if (!cached.permissionsSeeded) {
     cached.permissionsSeeded = true;
     await initPermissions();
   }
 
-  return cached.conn;
+  return conn;
 };
