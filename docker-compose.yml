@@ -1,0 +1,25 @@
+networks:
+  lingualink-network:
+    driver: bridge
+
+volumes:
+  mongodata:
+    name: lingualink_mongodata
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: lingualink-mongo
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodata:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - lingualink-network
