@@ -1,14 +1,16 @@
-import { useNavigate } from "react-router-dom";
+"use client";
+
+import { useRouter } from "next/navigation";
 
 const useNavigator = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const goTo = (path: string) => {
-    navigate(path);
+    router.push(path);
   };
 
   const goBack = () => {
-    navigate(-1);
+    router.back();
   };
 
   return { goTo, goBack };
