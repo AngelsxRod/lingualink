@@ -1,3 +1,5 @@
+"use client";
+
 import { Send } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -16,10 +18,7 @@ interface FormActions {
 
 interface AnswerFormProps {
   defaultValues?: Partial<AnswerFormValues>;
-  OnEvent: (args: {
-    data: AnswerFormValues;
-    questionId: string;
-  }) => { unwrap: () => Promise<unknown> };
+  OnEvent: (args: { data: AnswerFormValues; questionId: string }) => { unwrap: () => Promise<unknown> };
   actions?: FormActions;
   questionId: string;
 }
@@ -60,15 +59,9 @@ const AnswerForm = ({ defaultValues, OnEvent, actions, questionId }: AnswerFormP
 
   return (
     <div className="mt-6">
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">
-        Agregar un comentario
-      </h3>
+      <h3 className="text-xl font-semibold text-gray-800 mb-4">Agregar un comentario</h3>
       <FormProvider {...methods}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          autoComplete="off"
-          className="space-y-6"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} autoComplete="off" className="space-y-6">
           <TextArea
             name="content"
             placeholder="Escribe aquí..."

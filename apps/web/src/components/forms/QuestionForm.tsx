@@ -1,3 +1,5 @@
+"use client";
+
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -43,9 +45,7 @@ const QuestionForm = ({ isOpen, onClose, defaultValues, OnEvent, actions }: Ques
 
   const handleClick = (tag: string) => {
     setSelectedTags((prevSelectedTags) =>
-      prevSelectedTags.includes(tag)
-        ? prevSelectedTags.filter((t) => t !== tag)
-        : [...prevSelectedTags, tag]
+      prevSelectedTags.includes(tag) ? prevSelectedTags.filter((t) => t !== tag) : [...prevSelectedTags, tag]
     );
   };
 
@@ -83,17 +83,9 @@ const QuestionForm = ({ isOpen, onClose, defaultValues, OnEvent, actions }: Ques
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      title={defaultValues ? "Editar Área" : "Agregar Pregunta"}
-    >
+    <Modal isOpen={isOpen} onClose={handleClose} title={defaultValues ? "Editar Área" : "Agregar Pregunta"}>
       <FormProvider {...methods}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-8"
-          autoComplete="off"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" autoComplete="off">
           {actions?.isLoading ? (
             <Spinner />
           ) : (
@@ -121,9 +113,7 @@ const QuestionForm = ({ isOpen, onClose, defaultValues, OnEvent, actions }: Ques
                 }}
               />
               <div>
-                <h2 className="text-lg font-semibold text-center text-gray-800">
-                  Selecciona las etiquetas:
-                </h2>
+                <h2 className="text-lg font-semibold text-center text-gray-800">Selecciona las etiquetas:</h2>
 
                 <div className="flex justify-items-center">
                   <button
@@ -158,12 +148,7 @@ const QuestionForm = ({ isOpen, onClose, defaultValues, OnEvent, actions }: Ques
           )}
 
           <div className="mt-4">
-            <Button
-              variant="solid"
-              className="w-full py-2"
-              type="submit"
-              disabled={actions?.isLoading}
-            >
+            <Button variant="solid" className="w-full py-2" type="submit" disabled={actions?.isLoading}>
               {actions?.isLoading ? "Cargando..." : "Enviar"}
             </Button>
           </div>

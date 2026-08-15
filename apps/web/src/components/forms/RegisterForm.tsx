@@ -1,3 +1,5 @@
+"use client";
+
 import { FormProvider, useForm } from "react-hook-form";
 import { Button, InputField } from "../ui";
 import { Mail, Lock, User, Contact } from "lucide-react";
@@ -25,9 +27,7 @@ const RegisterForm = () => {
     } catch (error) {
       console.error("Error en el registro:", error);
       const err = error as { data?: { message?: string } };
-      toast.error(
-        err?.data?.message || "Error en el registro, intenta nuevamente."
-      );
+      toast.error(err?.data?.message || "Error en el registro, intenta nuevamente.");
     }
   };
 
@@ -116,18 +116,11 @@ const RegisterForm = () => {
           placeholder="Confirma tu contraseña"
           rules={{
             required: "La confirmación de la contraseña es obligatoria",
-            validate: (value) =>
-              value === methods.getValues("password") ||
-              "Las contraseñas no coinciden",
+            validate: (value) => value === methods.getValues("password") || "Las contraseñas no coinciden",
           }}
         />
         <div className="md:col-span-2 ">
-          <Button
-            variant="solid"
-            className="w-full py-3 "
-            type="submit"
-            disabled={isLoading}
-          >
+          <Button variant="solid" className="w-full py-3 " type="submit" disabled={isLoading}>
             {isLoading ? "Cargando..." : "Crear cuenta"}
           </Button>
         </div>

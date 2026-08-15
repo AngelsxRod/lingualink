@@ -1,2 +1,2 @@
 export * from "./LoginForm";
-export * from "./QuestionForm";
+export { default as QuestionForm } from "./QuestionForm";

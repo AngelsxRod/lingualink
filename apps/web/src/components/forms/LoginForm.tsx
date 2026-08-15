@@ -1,9 +1,11 @@
+"use client";
+
 import { Lock, Mail } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Button, InputField } from "../ui";
 import type { LoginDto } from "@lingualink/shared";
-
 import useAuth from "../../hooks/useAuth";
+
 export const LoginForm = () => {
   const methods = useForm<LoginDto>();
   const { handleSubmit } = methods;
@@ -14,12 +16,7 @@ export const LoginForm = () => {
   };
   return (
     <FormProvider {...methods}>
-      <form
-        className="space-y-8"
-        noValidate
-        autoComplete="off"
-        onSubmit={handleSubmit(onSubmit)}
-      >
+      <form className="space-y-8" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <InputField
           icon={Mail}
           name="email"
@@ -49,15 +46,9 @@ export const LoginForm = () => {
           }}
         />
         <div className="mt-4">
-          <Button
-            variant="solid"
-            className="w-full py-2"
-            type="submit"
-            disabled={isLoading}
-          >
+          <Button variant="solid" className="w-full py-2" type="submit" disabled={isLoading}>
             {isLoading ? "Cargando..." : "Iniciar sesión"}
           </Button>
-
         </div>
       </form>
     </FormProvider>
