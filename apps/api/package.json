@@ -1,0 +1,47 @@
+{
+  "name": "lingualink-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "imports": {
+    "#permission": "./src/modules/permission/index.js",
+    "#modules": "./src/modules/index.js",
+    "#user": "./src/modules/user/index.js",
+    "#tag": "./src/modules/tag/index.js",
+    "#question": "./src/modules/question/index.js",
+    "#answer": "./src/modules/answer/index.js",
+    "#middleware": "./src/middlewares/index.js",
+    "#util": "./src/util/index.js",
+    "#role": "./src/modules/role/index.js",
+    "#auth": "./src/modules/auth/index.js",
+    "#resource": "./src/modules/resource/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "dependencies": {
+    "axios": "^1.8.3",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-validator": "^7.2.1",
+    "firebase": "^11.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.12.1",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.2",
+    "serverless-http": "^3.2.0",
+    "zxcvbn": "^4.4.2"
+  }
+}
