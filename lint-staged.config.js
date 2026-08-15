@@ -1,4 +1,3 @@
 module.exports = {
-  'apps/web/**/*.{js,jsx}': (files) =>
-    `pnpm --filter @lingualink/web exec eslint --fix ${files.join(' ')}`,
+  '**/*.{ts,tsx}': (files) => `eslint --fix ${files.join(' ')}`,
 };
