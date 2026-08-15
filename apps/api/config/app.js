@@ -14,8 +14,6 @@ import {
   resourceRoutes,
 } from "#modules";
 
-import ServerlessHttp from "serverless-http";
-
 const app = express();
 const port = config.port || 2656;
 // Middlewares
@@ -48,4 +46,4 @@ export const initServer = () => {
   });
 };
 
-export const handler = ServerlessHttp(app);
+export default app;
