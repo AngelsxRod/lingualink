@@ -9,7 +9,7 @@ import {
 } from "#question";
 import { questionValidator, validateJWT } from "#middleware";
 
-export const router = Router();
+export const router: Router = Router();
 
 router.get("/", getQuestionsController);
 
@@ -35,4 +35,9 @@ router.delete(
   deleteQuestionController
 );
 
-router.post("/:id/vote", validateJWT, voteQuestionController);
+router.post(
+  "/:id/vote",
+  validateJWT,
+  questionValidator.VoteQuestionValidators,
+  voteQuestionController
+);

@@ -8,7 +8,7 @@ import {
 } from "#answer";
 import { answerValidator, validateJWT } from "#middleware";
 
-export const router = Router();
+export const router: Router = Router();
 
 router.get("/:questionId", getAnswersController);
 
@@ -33,4 +33,9 @@ router.delete(
   deleteAnswerController
 );
 
-router.post("/:id/vote", validateJWT, voteAnswerController);
+router.post(
+  "/:id/vote",
+  validateJWT,
+  answerValidator.VoteAnswerValidators,
+  voteAnswerController
+);
