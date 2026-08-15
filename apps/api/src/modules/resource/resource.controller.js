@@ -1,3 +1,4 @@
+import { put } from "@vercel/blob";
 import {
   createResource,
   getAllResources,
@@ -8,15 +9,20 @@ export const addResource = async (req, res) => {
   try {
     const { title, description } = req.body;
     const file = req.file;
-        
+
     if (!file) {
       return res.status(400).json({ message: "Archivo es requerido" });
     }
 
+    const blob = await put(`resources/${Date.now()}-${file.originalname}`, file.buffer, {
+      access: "public",
+      contentType: file.mimetype,
+    });
+
     const resourceData = {
       title,
       description,
-      filePath: file.path,
+      filePath: blob.url,
     };
 
     const newResource = await createResource(resourceData);
