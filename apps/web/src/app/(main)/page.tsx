@@ -1,11 +1,10 @@
-import {
-  useGetQuestionsQuery,
-  useCreateQuestionMutation,
-} from "../../features/api/questionApi";
-import { useGetTagsQuery } from "../../features/api/tagApi"; // Importar la consulta de tags
+"use client";
+
+import { useGetQuestionsQuery, useCreateQuestionMutation } from "../../features/api/questionApi";
+import { useGetTagsQuery } from "../../features/api/tagApi";
 import { Button, ForumCard, Spinner, Sidebar } from "../../components/ui";
 import { useState, Suspense, lazy, useEffect } from "react";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react"; // Asegúrate de tener lucide-react instalado
+import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import useAuth from "../../hooks/useAuth";
 
 const QuestionForm = lazy(() => import("../../components/forms/QuestionForm"));
@@ -34,8 +33,7 @@ const Home = () => {
   });
 
   const { isAuthenticated } = useAuth();
-  const [createQuestion, { isLoading: isCreating, isError }] =
-    useCreateQuestionMutation();
+  const [createQuestion, { isLoading: isCreating, isError }] = useCreateQuestionMutation();
 
   const questions = questionsData?.questions || [];
   const tags = tagsData?.tags || [];
@@ -61,11 +59,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
-      {/* Sidebar con tags dinámicos */}
-      <Sidebar
-        tags={isLoadingTags ? [] : tags.map((tag) => tag.name)}
-        onFilterChange={handleFilterChange}
-      />
+      <Sidebar tags={isLoadingTags ? [] : tags.map((tag) => tag.name)} onFilterChange={handleFilterChange} />
 
       <div className="flex-1 px-4 container mx-auto py-4 lg:ml-54 ml-0">
         <div className="flex justify-end">
@@ -85,7 +79,6 @@ const Home = () => {
           )}
         </div>
 
-        {/* Modal Form */}
         {isOpen && (
           <Suspense
             fallback={
@@ -103,22 +96,14 @@ const Home = () => {
           </Suspense>
         )}
         <div className="flex flex-col items-center">
-          {isLoadingQuestions && (
-            <p className="text-gray-600">Cargando preguntas...</p>
-          )}
-          {!isLoadingQuestions && error && (
-            <p className="text-red-600">Error al cargar las preguntas.</p>
-          )}
+          {isLoadingQuestions && <p className="text-gray-600">Cargando preguntas...</p>}
+          {!isLoadingQuestions && error && <p className="text-red-600">Error al cargar las preguntas.</p>}
           {!isLoadingQuestions && questions.length === 0 && (
             <p className="text-gray-500">No hay preguntas disponibles.</p>
           )}
 
-          {!isLoadingQuestions &&
-            questions.map((question) => (
-              <ForumCard key={question._id} question={question} />
-            ))}
+          {!isLoadingQuestions && questions.map((question) => <ForumCard key={question._id} question={question} />)}
 
-          {/* Paginador */}
           <div className="flex items-center space-x-4 mb-4">
             <Button
               variant="outline"

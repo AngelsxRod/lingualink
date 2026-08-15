@@ -1,7 +1,10 @@
+"use client";
+
 import { House } from "lucide-react";
-import { LoginForm } from "../../components/forms";
-import { Button } from "../../components/ui";
-import useNavigator from "../../hooks/useNavigator";
+import { LoginForm } from "../../../components/forms";
+import { Button } from "../../../components/ui";
+import useNavigator from "../../../hooks/useNavigator";
+
 const Login = () => {
   const { goTo } = useNavigator();
 
@@ -15,7 +18,6 @@ const Login = () => {
 
   return (
     <div className="h-screen md:flex">
-      {/* Botón de regresar */}
       <Button className="absolute z-50 top-4 left-4" onClick={handleGoBack}>
         <House />
       </Button>
@@ -31,29 +33,18 @@ const Login = () => {
       >
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="relative z-10 text-center p-4">
-          <h1 className="text-white font-bold text-4xl font-sans">
-            LinguaLink
-          </h1>
-          <p className="text-white mt-1">
-            La plataforma ideal para estudiantes que buscan aprender juntos
-          </p>
+          <h1 className="text-white font-bold text-4xl font-sans">LinguaLink</h1>
+          <p className="text-white mt-1">La plataforma ideal para estudiantes que buscan aprender juntos</p>
         </div>
       </div>
       <div className="flex flex-col md:flex-row md:w-1/2 justify-center items-center bg-white h-full">
         <div className="bg-white max-w-md w-full p-8">
-          <h1 className="text-gray-800 font-bold text-3xl mb-1">
-            Inicia sesión
-          </h1>
-          <p className="text-sm font-normal text-gray-400 mb-7">
-            Bienvenido de nuevo, estudiante
-          </p>
+          <h1 className="text-gray-800 font-bold text-3xl mb-1">Inicia sesión</h1>
+          <p className="text-sm font-normal text-gray-400 mb-7">Bienvenido de nuevo, estudiante</p>
           <LoginForm />
           <p className="text-center mt-6 text-sm text-gray-400">
             ¿No tienes una cuenta?{" "}
-            <span
-              className="text-blue-500 hover:underline cursor-pointer"
-              onClick={handleGoToRegister}
-            >
+            <span className="text-blue-500 hover:underline cursor-pointer" onClick={handleGoToRegister}>
               Regístrate
             </span>
           </p>

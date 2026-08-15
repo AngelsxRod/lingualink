@@ -1,9 +1,10 @@
+"use client";
+
 import { House } from "lucide-react";
-import RegisterForm from "../../components/forms/RegisterForm";
-import { Button } from "../../components/ui";
-import useNavigator from "../../hooks/useNavigator";
-import { LogoImage } from "../../assets";
-import { Link } from "react-router-dom";
+import RegisterForm from "../../../components/forms/RegisterForm";
+import { Button } from "../../../components/ui";
+import useNavigator from "../../../hooks/useNavigator";
+import Link from "next/link";
 
 const Register = () => {
   const { goTo } = useNavigator();
@@ -19,22 +20,14 @@ const Register = () => {
       </Button>
       <div className="w-full max-w-3xl mx-6 bg-opacity-90 md:py-0 py-8 ">
         <div className="text-center mb-8">
-          <img
-            src={LogoImage}
-            alt="Logo"
-            className="mx-auto mb-4 size-16 object-contain"
-          />
-          <h1 className="text-3xl font-bold text-emerald-500 mb-2">
-            Crear Cuenta
-          </h1>
-          <p className="text-sm text-gray-300">
-            Completa los campos para registrarte.
-          </p>
+          <img src="/logo.svg" alt="Logo" className="mx-auto mb-4 size-16 object-contain" />
+          <h1 className="text-3xl font-bold text-emerald-500 mb-2">Crear Cuenta</h1>
+          <p className="text-sm text-gray-300">Completa los campos para registrarte.</p>
         </div>
         <RegisterForm />
         <p className="text-center mt-6 text-sm text-gray-300">
           ¿Ya tienes una cuenta?{" "}
-          <Link to="/auth/login" className="text-blue-500 hover:underline">
+          <Link href="/auth/login" className="text-blue-500 hover:underline">
             Inicia sesión
           </Link>
         </p>
