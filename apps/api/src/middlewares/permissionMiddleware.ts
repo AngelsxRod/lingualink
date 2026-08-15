@@ -1,21 +1,22 @@
+import type { Request, Response, NextFunction } from "express";
 import { Role } from "#role";
+import type { RoleWithPermissionsDocument } from "../types/express.js";
 
-export const permissionMiddleware = (...permissionNames) => {
-  return async (req, res, next) => {
+export const permissionMiddleware = (...permissionNames: string[]) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     if (!req.user || !req.user.role) {
       return res.status(403).json({ message: "Acceso restringido" });
     }
 
     try {
-      const role = await Role.findById(req.user.role._id).populate(
-        "permissions"
-      );
+      const userRole = req.user.role as RoleWithPermissionsDocument;
+      const role = await Role.findById(userRole._id).populate("permissions");
 
       if (!role) {
         return res.status(403).json({ message: "Rol no encontrado" });
       }
 
-      const hasPermission = role.permissions.some((p) =>
+      const hasPermission = role.permissions.some((p: { name: string }) =>
         permissionNames.includes(p.name)
       );
 
