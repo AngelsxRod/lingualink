@@ -1,5 +1,5 @@
 import { initServer } from "./config/app.js";
-import { connect } from "./config/db.js";
+import { connectToDatabase } from "./config/db.js";
 
 initServer();
-connect();
+connectToDatabase();
