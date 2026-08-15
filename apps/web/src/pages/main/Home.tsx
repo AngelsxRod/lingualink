@@ -10,9 +10,14 @@ import useAuth from "../../hooks/useAuth";
 
 const QuestionForm = lazy(() => import("../../components/forms/QuestionForm"));
 
+interface QuestionFilters {
+  tags?: string[];
+  sortBy?: string;
+}
+
 const Home = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState<QuestionFilters>({});
   const [page, setPage] = useState(1);
   const {
     data: questionsData,
@@ -42,7 +47,7 @@ const Home = () => {
     }
   }, [questions, isLoadingQuestions, page]);
 
-  const handleFilterChange = (newFilters) => {
+  const handleFilterChange = (newFilters: QuestionFilters) => {
     setFilters((prevFilters) => ({ ...prevFilters, ...newFilters }));
   };
 

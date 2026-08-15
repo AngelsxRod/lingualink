@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Clock, ThumbsDown, ThumbsUp, User } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
+import type { TagSummary } from "@lingualink/shared";
 import { decodeToken } from "../../Utils/JWTUtil";
 import { formatDate } from "../../Utils/formatDate";
 import AnswerForm from "../../components/forms/AnswerForm";
@@ -17,31 +18,31 @@ import {
 import useAuth from "../../hooks/useAuth";
 
 const Question = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data, error, isLoading } = useGetQuestionByIdQuery(id);
+  const { data, error, isLoading } = useGetQuestionByIdQuery(id as string);
   const [voteQuestion] = useVoteQuestionMutation();
   const { isAuthenticated, token } = useAuth();
   const { data: dataAnswers } = useGetAnswersQuery({
     page: 1,
     pageSize: 10,
-    questionId: id,
+    questionId: id as string,
   });
 
-  let userId = null;
+  let userId: string | null = null;
 
   if (isAuthenticated) {
     const decoded = decodeToken(token);
-    userId = decoded.id;
+    userId = decoded?.id ?? null;
   }
 
-  const handleVote = async (vote) => {
+  const handleVote = async (vote: 0 | 1) => {
     try {
       if (!isAuthenticated) {
         toast.error("Debes iniciar sesión para votar");
         return;
       }
-      await voteQuestion({ id, vote });
+      await voteQuestion({ id: id as string, vote });
     } catch (error) {
       console.error("Error al votar la pregunta:", error);
     }
@@ -62,7 +63,7 @@ const Question = () => {
       </div>
     );
 
-  if (error)
+  if (error || !data)
     return (
       <div className="flex justify-center items-center h-screen text-xl font-semibold text-rose-500">
         Ocurrió un error al cargar la pregunta.
@@ -70,6 +71,8 @@ const Question = () => {
     );
 
   const formattedDate = formatDate(data.createdAt);
+  const user = typeof data.user === "string" ? null : data.user;
+  const tags = (typeof data.tags[0] === "string" ? [] : data.tags) as TagSummary[];
 
   return (
     <div className="max-w-6xl mx-auto bg-white p-4">
@@ -132,7 +135,7 @@ const Question = () => {
           <User className="w-4 h-4" />
           Publicado por:{" "}
           <span className="font-medium text-gray-700">
-            {data.user.username}
+            {user?.username}
           </span>
         </span>
         <span className="flex items-center gap-1">
@@ -142,7 +145,7 @@ const Question = () => {
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">
-        {data.tags.map((tag) => (
+        {tags.map((tag) => (
           <span
             key={tag._id}
             className="px-3 py-1 bg-emerald-100 text-emerald-800 text-sm font-medium rounded-full"
@@ -155,7 +158,7 @@ const Question = () => {
       <AnswerForm
         OnEvent={createAnswer}
         actions={{ isLoading: isCreatingAnswer, isError: isErrorAnswer }}
-        questionId={id}
+        questionId={id as string}
       />
       <div className="mb-6">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">
@@ -165,7 +168,7 @@ const Question = () => {
           <AnswerCard
             key={answer._id}
             answer={answer}
-            userId={userId}
+            userId={userId as string}
             isAuthenticated={isAuthenticated}
           />
         ))}
