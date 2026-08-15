@@ -1,8 +1,16 @@
 import { Clock, MessageCircle, ThumbsDown, ThumbsUp, User } from "lucide-react";
 import { Link } from "react-router-dom";
+import type { QuestionWithStats, TagSummary } from "@lingualink/shared";
 import { formatDate } from "../../Utils/formatDate";
 
-export const ForumCard = ({ question }) => {
+interface ForumCardProps {
+  question: QuestionWithStats;
+}
+
+export const ForumCard = ({ question }: ForumCardProps) => {
+  const user = typeof question.user === "string" ? null : question.user;
+  const tags = (typeof question.tags[0] === "string" ? [] : question.tags) as TagSummary[];
+
   return (
     <div className="max-w-4xl w-full mx-auto p-6 bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)] border border-gray-100 rounded-lg mb-6 hover:shadow-lg transition-shadow duration-300">
       <Link to={`/question/${question._id}`} className="block text-decoration-none">
@@ -12,7 +20,7 @@ export const ForumCard = ({ question }) => {
           <span className="flex items-center gap-1">
             <User className="w-4 h-4" />
             Publicado por:{" "}
-            <span className="font-medium text-gray-700">{question.user.username}</span>
+            <span className="font-medium text-gray-700">{user?.username}</span>
           </span>
           <span className="flex items-center gap-1">
             <Clock className="w-4 h-4" />
@@ -20,7 +28,7 @@ export const ForumCard = ({ question }) => {
           </span>
         </div>
         <div className="flex flex-wrap gap-2 mb-6">
-          {question.tags.map((tag) => (
+          {tags.map((tag) => (
             <span
               key={tag._id}
               className="px-3 py-1 bg-emerald-100 text-emerald-800 text-sm font-medium rounded-full"

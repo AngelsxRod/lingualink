@@ -1,19 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { Check, Menu, Funnel } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Check, Funnel } from "lucide-react";
 import { Button } from "./Button";
 
-export const Sidebar = ({ tags, onFilterChange }) => {
-  const [selectedTags, setSelectedTags] = useState([]);
+interface SidebarProps {
+  tags: string[];
+  onFilterChange: (filters: { tags: string[]; sortBy: string }) => void;
+}
+
+export const Sidebar = ({ tags, onFilterChange }: SidebarProps) => {
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState("");
   const [isOpen, setIsOpen] = useState(false); // Estado para controlar la visibilidad del Sidebar en móvil
 
-  const handleTagChange = (tag) => {
+  const handleTagChange = (tag: string) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
-  const handleSortChange = (order) => {
+  const handleSortChange = (order: string) => {
     setSortOrder(order);
   };
 
@@ -23,6 +28,7 @@ export const Sidebar = ({ tags, onFilterChange }) => {
 
   useEffect(() => {
     onFilterChange({ tags: selectedTags, sortBy: sortOrder });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTags, sortOrder]);
 
   return (

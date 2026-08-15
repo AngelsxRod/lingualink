@@ -1,13 +1,20 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
-export const DropDown = ({ options, onSelect, label, avatar }) => {
+interface DropDownProps {
+  options: string[];
+  onSelect: (option: string) => void;
+  label?: string;
+  avatar?: string;
+}
+
+export const DropDown = ({ options, onSelect, label, avatar }: DropDownProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleSelect = (option) => {
+  const handleSelect = (option: string) => {
     onSelect(option);
     setIsOpen(false);
   };

@@ -1,4 +1,10 @@
-export const TagButton = ({ label, active = false, onClick }) => {
+interface TagButtonProps {
+  label: string;
+  active?: boolean;
+  onClick?: () => void;
+}
+
+export const TagButton = ({ label, active = false, onClick }: TagButtonProps) => {
   const baseClasses =
     "px-3 py-1 rounded-lg cursor-pointer select-none flex items-center justify-center text-white font-semibold text-base transition-all duration-150 border-b-[1px] active:translate-y-[2px] active:[box-shadow:0_0px_0_0_#2d9f74,0_0px_0_0_#56d68f] active:border-b-[0px]";
 

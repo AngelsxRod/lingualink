@@ -1,6 +1,16 @@
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react"; // Importa los íconos de lucide-react
-import { useFormContext } from "react-hook-form";
+import { Eye, EyeOff, type LucideIcon } from "lucide-react"; // Importa los íconos de lucide-react
+import { useFormContext, type RegisterOptions } from "react-hook-form";
+
+interface InputFieldProps {
+  icon?: LucideIcon;
+  type?: string;
+  darkMode?: boolean;
+  placeholder?: string;
+  label?: string;
+  name: string;
+  rules?: RegisterOptions;
+}
 
 export const InputField = ({
   icon: Icon,
@@ -10,7 +20,7 @@ export const InputField = ({
   label = "",
   name = "",
   rules = {},
-}) => {
+}: InputFieldProps) => {
   const {
     register,
     formState: { errors },
@@ -23,6 +33,8 @@ export const InputField = ({
   const labelClass = darkMode
     ? "block text-white text-base font-semibold mb-1"
     : "block text-gray-900 text-base font-semibold mb-1";
+
+  const errorMessage = errors[name]?.message as string | undefined;
 
   return (
     <div className="relative">
@@ -40,7 +52,6 @@ export const InputField = ({
         {Icon && <Icon className="h-5 w-5 text-gray-400 mr-2" />}
         <input
           id={name}
-          name={name}
           type={inputType}
           placeholder={placeholder}
           {...register(name, rules)}
@@ -60,9 +71,9 @@ export const InputField = ({
         )}
       </div>
       {/* ERROR MESSAGE */}
-      {errors[name] && (
+      {errorMessage && (
         <span className="absolute ml-2 font-medium text-rose-600 text-sm">
-          {errors[name].message}
+          {errorMessage}
         </span>
       )}
     </div>

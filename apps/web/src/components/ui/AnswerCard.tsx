@@ -1,11 +1,19 @@
 import { Clock, ThumbsDown, ThumbsUp, User } from "lucide-react";
+import type { AnswerWithStats } from "@lingualink/shared";
 import { useVoteAnswerMutation } from "../../features/api/answerApi";
 import { formatDate } from "../../Utils/formatDate";
 
-export const AnswerCard = ({ answer, userId, isAuthenticated }) => {
-  const [voteAnswer] = useVoteAnswerMutation();
+interface AnswerCardProps {
+  answer: AnswerWithStats;
+  userId: string;
+  isAuthenticated: boolean;
+}
 
-  const handleAnswerVote = async (answerId, vote) => {
+export const AnswerCard = ({ answer, userId, isAuthenticated }: AnswerCardProps) => {
+  const [voteAnswer] = useVoteAnswerMutation();
+  const user = typeof answer.user === "string" ? null : answer.user;
+
+  const handleAnswerVote = async (answerId: string, vote: 0 | 1) => {
     try {
       if (!isAuthenticated) {
         return;
@@ -26,7 +34,7 @@ export const AnswerCard = ({ answer, userId, isAuthenticated }) => {
         <div className="flex items-center gap-2 text-gray-600">
           <User className="w-5 h-5" />
           <span className="font-medium text-gray-800">
-            {answer.user.username}
+            {user?.username}
           </span>
         </div>
         <div className="flex items-center gap-2 text-gray-500">

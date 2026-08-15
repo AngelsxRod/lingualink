@@ -6,11 +6,11 @@ import useAuth from "../../hooks/useAuth";
 import { LogoImage } from "../../assets";
 
 export const Navbar = () => {
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [, setSelectedOption] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isAuthenticated, logoutUser } = useAuth();
 
-  const handleSelect = (option) => {
+  const handleSelect = (option: string) => {
     if (option === "Cerrar session") {
       logoutUser();
     }
