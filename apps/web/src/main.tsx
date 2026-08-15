@@ -6,7 +6,7 @@ import { store } from "./app/store";
 import "./index.css";
 import App from "./App";
 
-createRoot(document.getElementById("root")).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <HashRouter>
       <Provider store={store}>
