@@ -1,6 +1,31 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, type HydratedDocument, type Types } from "mongoose";
 
-const userSchema = new Schema(
+export interface UserDocument {
+  name: string;
+  lastname: string;
+  email: string;
+  username: string;
+  password: string;
+  role?: Types.ObjectId | null;
+  analytics: {
+    questions: {
+      votesAccepted: number;
+      votesRejected: number;
+      questionsAsked: number;
+    };
+    answers: {
+      votesAccepted: number;
+      votesRejected: number;
+      answersGiven: number;
+      acceptedAnswers: number;
+    };
+  };
+  status: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const userSchema = new Schema<UserDocument>(
   {
     name: {
       type: String,
@@ -73,4 +98,5 @@ const userSchema = new Schema(
   }
 );
 
-export const User = model("User", userSchema);
+export const User = model<UserDocument>("User", userSchema);
+export type UserHydratedDocument = HydratedDocument<UserDocument>;
