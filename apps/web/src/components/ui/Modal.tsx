@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { X } from "lucide-react";
@@ -37,10 +39,7 @@ export const Modal = ({ title, isOpen, onClose, children }: ModalProps) => {
   return (
     <div className="fixed inset-0 p-4 flex flex-wrap justify-center items-center w-full h-full z-[1000] overflow-auto">
       <div className="fixed inset-0 w-full h-full bg-[rgba(0,0,0,0.6)] backdrop-blur-xs"></div>
-      <div
-        ref={modalRef}
-        className="relative w-full max-w-xl p-6 bg-white shadow-lg rounded-xl z-[1001]"
-      >
+      <div ref={modalRef} className="relative w-full max-w-xl p-6 bg-white shadow-lg rounded-xl z-[1001]">
         <div className="flex items-center pb-3 border-b border-gray-300">
           <div className="flex-1 text-xl font-bold text-gray-800">
             {title ? <h2 className="text-xl font-bold">{title}</h2> : null}

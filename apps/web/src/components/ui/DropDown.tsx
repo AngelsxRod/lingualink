@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 
 interface DropDownProps {
@@ -22,29 +24,21 @@ export const DropDown = ({ options, onSelect, label, avatar }: DropDownProps) =>
   return (
     <div className="relative inline-block text-left">
       {!avatar ? (
-        <>
-          <button
-            className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none active:scale-95 transition-transform duration-200 ease-in-out"
-            onClick={handleToggle}
-            type="button"
-          >
-            {label}
-          </button>
-        </>
+        <button
+          className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none active:scale-95 transition-transform duration-200 ease-in-out"
+          onClick={handleToggle}
+          type="button"
+        >
+          {label}
+        </button>
       ) : (
-        <>
-          <button
-            className="inline-flex justify-center w-full rounded-full text-sm font-medium  border-2 border-emerald-400 shadow-sm active:scale-95 transition-transform duration-200 ease-in-out"
-            onClick={handleToggle}
-            type="button"
-          >
-            <img
-              className="inline-block size-10 rounded-full"
-              src={avatar}
-              alt="Avatar"
-            />
-          </button>
-        </>
+        <button
+          className="inline-flex justify-center w-full rounded-full text-sm font-medium  border-2 border-emerald-400 shadow-sm active:scale-95 transition-transform duration-200 ease-in-out"
+          onClick={handleToggle}
+          type="button"
+        >
+          <img className="inline-block size-10 rounded-full" src={avatar} alt="Avatar" />
+        </button>
       )}
 
       {isOpen && (

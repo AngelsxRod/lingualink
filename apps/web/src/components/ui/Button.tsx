@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom";
+"use client";
+
+import Link from "next/link";
 import type { ReactNode, MouseEvent, ElementType } from "react";
 
 interface ButtonProps {
@@ -31,12 +33,19 @@ export const Button = ({
       "bg-white text-emerald-500 border-emerald-500 shadow-[4px_4px_0px_rgba(16,185,129,0.5)] hover:shadow-[2px_2px_0px_rgba(16,185,129,0.5)]",
   };
 
-  const Component: ElementType = as === "link" ? Link : as === "a" ? "a" : "button";
+  if (as === "link") {
+    return (
+      <Link href={to || "#"} className={`${baseStyles} ${variants[variant]} ${className}`} onClick={onClick} {...props}>
+        {children}
+      </Link>
+    );
+  }
+
+  const Component: ElementType = as === "a" ? "a" : "button";
 
   return (
     <Component
       className={`${baseStyles} ${variants[variant]} ${className}`}
-      to={as === "link" ? to : undefined}
       href={as === "a" ? href : undefined}
       onClick={onClick}
       {...props}

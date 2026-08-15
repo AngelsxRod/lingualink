@@ -1,5 +1,7 @@
+"use client";
+
 import { useState } from "react";
-import { Eye, EyeOff, type LucideIcon } from "lucide-react"; // Importa los íconos de lucide-react
+import { Eye, EyeOff, type LucideIcon } from "lucide-react";
 import { useFormContext, type RegisterOptions } from "react-hook-form";
 
 interface InputFieldProps {
@@ -38,16 +40,11 @@ export const InputField = ({
 
   return (
     <div className="relative">
-      {/* LABEL */}
       {label && (
-        <label
-          htmlFor={name}
-          className={`${labelClass}`}
-        >
+        <label htmlFor={name} className={`${labelClass}`}>
           {label}
         </label>
       )}
-      {/* INPUT */}
       <div className="flex items-center border-2 border-gray-200 py-3 px-3 rounded bg-white shadow-[0_3px_10px_rgb(0,0,0,0.2)] focus-within:border-emerald-500 transition duration-200 ease-in-out">
         {Icon && <Icon className="h-5 w-5 text-gray-400 mr-2" />}
         <input
@@ -58,23 +55,13 @@ export const InputField = ({
           className="outline-none border-none w-full"
         />
         {type === "password" && (
-          <div
-            onClick={() => setShowPassword(!showPassword)}
-            className="cursor-pointer"
-          >
-            {showPassword ? (
-              <EyeOff className="h-5 w-5 text-gray-400" />
-            ) : (
-              <Eye className="h-5 w-5 text-gray-400" />
-            )}
+          <div onClick={() => setShowPassword(!showPassword)} className="cursor-pointer">
+            {showPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
           </div>
         )}
       </div>
-      {/* ERROR MESSAGE */}
       {errorMessage && (
-        <span className="absolute ml-2 font-medium text-rose-600 text-sm">
-          {errorMessage}
-        </span>
+        <span className="absolute ml-2 font-medium text-rose-600 text-sm">{errorMessage}</span>
       )}
     </div>
   );
