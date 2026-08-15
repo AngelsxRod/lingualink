@@ -1,8 +1,4 @@
-import type {
-  QuestionsListResponse,
-  QuestionWithStats,
-  CreateQuestionDto,
-} from "@lingualink/shared";
+import type { QuestionsListResponse, QuestionWithStats, CreateQuestionDto } from "@lingualink/shared";
 import apiSlice from "./apiSlice";
 
 interface GetQuestionsArgs {
@@ -22,14 +18,7 @@ interface VoteQuestionArgs {
 export const questionAPi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getQuestions: builder.query<QuestionsListResponse, GetQuestionsArgs>({
-      query: ({
-        page,
-        pageSize,
-        tags,
-        sortBy,
-        positiveVotes,
-        negativeVotes,
-      }) => ({
+      query: ({ page, pageSize, tags, sortBy, positiveVotes, negativeVotes }) => ({
         url: "/question",
         params: { page, pageSize, tags, sortBy, positiveVotes, negativeVotes },
       }),

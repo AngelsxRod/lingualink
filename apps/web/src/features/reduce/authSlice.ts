@@ -1,13 +1,17 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { User } from "@lingualink/shared";
 
 export interface AuthState {
-  token: string | null;
+  user: User | null;
   isLoading: boolean;
   error: string | null;
 }
 
+// El JWT ya no vive aquí (ni en sessionStorage): ahora es una cookie httpOnly que
+// setea el backend en /auth/login. Este slice solo guarda el usuario autenticado,
+// hidratado al montar la app vía GET /user/profile (ver AuthBootstrap).
 const initialState: AuthState = {
-  token: sessionStorage.getItem("token") || null,
+  user: null,
   isLoading: false,
   error: null,
 };
@@ -16,13 +20,11 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    loginSuccess(state, action: PayloadAction<{ token: string }>) {
-      state.token = action.payload.token;
-      sessionStorage.setItem("token", action.payload.token);
+    setUser(state, action: PayloadAction<User>) {
+      state.user = action.payload;
     },
-    logout(state) {
-      state.token = null;
-      sessionStorage.removeItem("token");
+    clearUser(state) {
+      state.user = null;
     },
     setLoading(state, action: PayloadAction<boolean>) {
       state.isLoading = action.payload;
@@ -33,5 +35,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { loginSuccess, logout, setLoading, setError } = authSlice.actions;
+export const { setUser, clearUser, setLoading, setError } = authSlice.actions;
 export default authSlice.reducer;

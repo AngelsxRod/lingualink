@@ -1,22 +1,15 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-interface AuthStateSlice {
-  auth: { token: string | null };
-}
-
+// baseUrl relativo: next.config.ts reescribe /api/* hacia el backend Nest server-side,
+// así el navegador ve todo como un solo origen y la cookie httpOnly del login viaja sola
+// (credentials:"include"), sin necesitar leer/mandar el token manualmente por header.
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_URL,
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as AuthStateSlice).auth.token;
-      if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
+    baseUrl: "/api",
+    credentials: "include",
   }),
-  tagTypes: ["Questions", "Answers", "Tags"],
+  tagTypes: ["Questions", "Answers", "Tags", "User"],
   endpoints: () => ({}),
 });
 
