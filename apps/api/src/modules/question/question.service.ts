@@ -1,63 +1,53 @@
-import { Question } from "#question";
-import { Answer } from "#answer";
-import { Tag } from "#tag";
-import type { FilterQuery, Types } from "mongoose";
-import type { QuestionDocument } from "./question.schema.js";
-import type { CreateQuestionDto } from "@lingualink/shared";
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { FilterQuery, Model, Types } from "mongoose";
+import { Question, QuestionDocument } from "./question.schema";
+import { Answer, AnswerDocument } from "../answer/answer.schema";
+import { Tag, TagDocument } from "../tag/tag.schema";
+import { TagService } from "../tag/tag.service";
+import { CreateQuestionDto } from "./dto/create-question.dto";
+import { UpdateQuestionDto } from "./dto/update-question.dto";
 
 interface QuestionFilters {
   tags?: string[];
   sortBy?: string;
 }
 
-export const getQuestions = async (
-  filters: QuestionFilters = {},
-  page: number | string = 1,
-  pageSize: number | string = 10
-) => {
-  try {
+@Injectable()
+export class QuestionService {
+  constructor(
+    @InjectModel(Question.name) private readonly questionModel: Model<QuestionDocument>,
+    @InjectModel(Answer.name) private readonly answerModel: Model<AnswerDocument>,
+    @InjectModel(Tag.name) private readonly tagModel: Model<TagDocument>,
+    private readonly tagService: TagService,
+  ) {}
+
+  async findAll(filters: QuestionFilters = {}, page: number | string = 1, pageSize: number | string = 10) {
     const currentPage = Number(page);
     const currentPageSize = Number(pageSize);
 
-    const query: FilterQuery<QuestionDocument> = { status: true };
-
+    const query: FilterQuery<Question> = { status: true };
     if (filters.tags && filters.tags.length > 0) {
-      const tagIds = await Tag.find({ name: { $in: filters.tags } }).select(
-        "_id"
-      );
+      const tagIds = await this.tagModel.find({ name: { $in: filters.tags } }).select("_id");
       query.tags = { $in: tagIds.map((tag) => tag._id) };
     }
 
-    // Obtener todas las preguntas sin paginar aún
-    const allQuestions = await Question.find(query)
+    const allQuestions = await this.questionModel
+      .find(query)
       .populate("user", "username")
       .populate("tags", "name")
-      .sort({ createdAt: -1 }) // orden predeterminado solo si no hay filtro por votos
+      .sort({ createdAt: -1 })
       .lean();
 
-    // Calcular votos y respuestas
     const questionsWithVotes = await Promise.all(
       allQuestions.map(async (question) => {
-        const answersCount = await Answer.countDocuments({
-          questionId: question._id,
-        });
-
-        const positiveVotes = question.votes.filter(
-          (vote) => vote.vote === 1
-        ).length;
-        const negativeVotes = question.votes.filter(
-          (vote) => vote.vote === 0
-        ).length;
+        const answersCount = await this.answerModel.countDocuments({ questionId: question._id });
+        const positiveVotes = question.votes.filter((vote) => vote.vote === 1).length;
+        const negativeVotes = question.votes.filter((vote) => vote.vote === 0).length;
         const totalVotes = positiveVotes + negativeVotes;
 
-        return {
-          ...question,
-          answersCount,
-          positiveVotes,
-          negativeVotes,
-          totalVotes,
-        };
-      })
+        return { ...question, answersCount, positiveVotes, negativeVotes, totalVotes };
+      }),
     );
 
     if (filters.sortBy === "mostVoted") {
@@ -67,10 +57,9 @@ export const getQuestions = async (
     }
 
     const totalQuestions = questionsWithVotes.length;
-
     const paginatedQuestions = questionsWithVotes.slice(
       (currentPage - 1) * currentPageSize,
-      currentPage * currentPageSize
+      currentPage * currentPageSize,
     );
 
     return {
@@ -80,104 +69,70 @@ export const getQuestions = async (
       totalPages: Math.ceil(totalQuestions / currentPageSize),
       currentPage,
     };
-  } catch (error) {
-    throw new Error((error as Error).message);
   }
-};
 
-export const getQuestionById = async (id: string) => {
-  try {
-    const question = await Question.findById(id)
+  async findOne(id: string) {
+    const question = await this.questionModel
+      .findById(id)
       .populate("user", "username")
       .populate("tags", "name")
       .lean();
 
     if (!question) {
-      throw new Error("Question not found");
+      throw new NotFoundException("Pregunta no existe");
     }
 
-    const answersCount = await Answer.countDocuments({
-      questionId: question._id,
-    });
+    const answersCount = await this.answerModel.countDocuments({ questionId: question._id });
+    const positiveVotes = question.votes.filter((vote) => vote.vote === 1).length;
+    const negativeVotes = question.votes.filter((vote) => vote.vote === 0).length;
 
-    const positiveVotes = question.votes.filter(
-      (vote) => vote.vote === 1
-    ).length;
-    const negativeVotes = question.votes.filter(
-      (vote) => vote.vote === 0
-    ).length;
-
-    return {
-      ...question,
-      answersCount,
-      positiveVotes,
-      negativeVotes,
-    };
-  } catch (error) {
-    throw new Error((error as Error).message);
+    return { ...question, answersCount, positiveVotes, negativeVotes };
   }
-};
 
-export const createQuestion = async (data: CreateQuestionDto & { user: string }) => {
-  console.log("🚀 ~ createQuestion ~ data:", data);
-  try {
-    const question = new Question(data);
-    await question.save();
-    return question;
-  } catch (error) {
-    throw new Error((error as Error).message);
+  async create(data: CreateQuestionDto, userId: string): Promise<QuestionDocument> {
+    await this.tagService.ensureAllExist(data.tags);
+    const question = new this.questionModel({ ...data, user: userId });
+    return question.save();
   }
-};
 
-export const updateQuestion = async (id: string, data: Partial<CreateQuestionDto>) => {
-  try {
-    const question = await Question.findByIdAndUpdate(id, data, { new: true });
-    return question;
-  } catch (error) {
-    throw new Error((error as Error).message);
+  async update(id: string, data: UpdateQuestionDto, userId: string): Promise<QuestionDocument> {
+    await this.ensureOwner(id, userId);
+    await this.tagService.ensureAllExist(data.tags);
+    const question = await this.questionModel.findByIdAndUpdate(id, data, { new: true });
+    return question!;
   }
-};
 
-export const deleteQuestion = async (id: string) => {
-  try {
-    const question = await Question.findByIdAndUpdate(
-      id,
-      { status: false },
-      { new: true }
-    );
-    return question;
-  } catch (error) {
-    throw new Error((error as Error).message);
+  async remove(id: string, userId: string): Promise<QuestionDocument> {
+    await this.ensureOwner(id, userId);
+    const question = await this.questionModel.findByIdAndUpdate(id, { status: false }, { new: true });
+    return question!;
   }
-};
 
-interface VoteQuestionInput {
-  id: string;
-  userId: string;
-  vote: 0 | 1;
-}
+  async vote(id: string, userId: string, vote: 0 | 1): Promise<QuestionDocument> {
+    const question = await this.ensureExists(id);
 
-export const voteQuestion = async (data: VoteQuestionInput) => {
-  try {
-    const question = await Question.findById(data.id);
+    const alreadyVoted = question.votes.some((v) => v.userId.toString() === userId);
+    if (alreadyVoted) {
+      throw new ConflictException("Ya has votado en esta pregunta");
+    }
 
+    question.votes.push({ userId: new Types.ObjectId(userId), vote });
+    return question.save();
+  }
+
+  async ensureExists(id: string): Promise<QuestionDocument> {
+    const question = await this.questionModel.findById(id);
     if (!question) {
-      throw new Error("Pregunta no existe");
+      throw new NotFoundException("La pregunta no existe");
     }
-
-    const existingVoteIndex = question.votes.findIndex(
-      (vote) => vote.userId.toString() === data.userId
-    );
-
-    if (existingVoteIndex !== -1) {
-      question.votes[existingVoteIndex].vote = data.vote;
-    } else {
-      question.votes.push({ userId: data.userId as unknown as Types.ObjectId, vote: data.vote });
-    }
-
-    const updatedQuestion = await question.save();
-    return updatedQuestion;
-  } catch (error) {
-    throw new Error((error as Error).message);
+    return question;
   }
-};
+
+  private async ensureOwner(id: string, userId: string): Promise<QuestionDocument> {
+    const question = await this.ensureExists(id);
+    if (question.user.toString() !== userId) {
+      throw new ForbiddenException("Solo puedes editar/eliminar tus preguntas");
+    }
+    return question;
+  }
+}

@@ -1,21 +1,33 @@
-import { Role } from "#role";
-import type { CreateRoleDto } from "@lingualink/shared";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { Role, RoleDocument } from "./role.schema";
+import { PermissionDocument } from "../permission/permission.schema";
+import { PermissionService } from "../permission/permission.service";
+import { CreateRoleDto } from "./dto/create-role.dto";
+import { UpdateRoleDto } from "./dto/update-role.dto";
 
-export const getRoles = async (page: number | string = 1, pageSize: number | string = 10) => {
-  try {
+@Injectable()
+export class RoleService {
+  constructor(
+    @InjectModel(Role.name) private readonly roleModel: Model<RoleDocument>,
+    private readonly permissionService: PermissionService,
+  ) {}
+
+  async findAll(page: number | string = 1, pageSize: number | string = 10) {
     const currentPage = Number(page);
     const currentPageSize = Number(pageSize);
     const skip = (currentPage - 1) * currentPageSize;
-    const roles = await Role.find({ status: true })
+    const roles = await this.roleModel
+      .find({ status: true })
       .skip(skip)
       .limit(currentPageSize)
       .populate("permissions", "name -_id");
-    const totalRoles = await Role.countDocuments({ status: true });
+    const totalRoles = await this.roleModel.countDocuments({ status: true });
+
     const rolesConPermisos = roles.map((role) => ({
       ...role.toObject(),
-      permissions: (role.permissions as unknown as { name: string }[]).map(
-        (permission) => permission.name
-      ),
+      permissions: (role.permissions as unknown as PermissionDocument[]).map((permission) => permission.name),
     }));
 
     return {
@@ -25,39 +37,42 @@ export const getRoles = async (page: number | string = 1, pageSize: number | str
       totalPages: Math.ceil(totalRoles / currentPageSize),
       currentPage,
     };
-  } catch (error) {
-    throw new Error((error as Error).message);
   }
-};
 
-export const createRole = async (data: CreateRoleDto) => {
-  try {
-    const role = new Role(data);
-    await role.save();
-    return role;
-  } catch (error) {
-    throw new Error((error as Error).message);
+  async create(data: CreateRoleDto): Promise<RoleDocument> {
+    const existing = await this.roleModel.findOne({ name: data.name });
+    if (existing) {
+      throw new ConflictException("El rol ya existe");
+    }
+    await this.permissionService.ensureAllExist(data.permissions);
+    const role = new this.roleModel(data);
+    return role.save();
   }
-};
 
-export const updateRole = async (id: string, data: Partial<CreateRoleDto>) => {
-  try {
-    const role = await Role.findByIdAndUpdate(id, data, { new: true });
-    return role;
-  } catch (error) {
-    throw new Error((error as Error).message);
+  async update(id: string, data: UpdateRoleDto): Promise<RoleDocument> {
+    await this.ensureExists(id);
+    if (data.name) {
+      const existing = await this.roleModel.findOne({ name: data.name });
+      if (existing && existing.id !== id) {
+        throw new ConflictException("El rol ya existe");
+      }
+    }
+    await this.permissionService.ensureAllExist(data.permissions);
+    const role = await this.roleModel.findByIdAndUpdate(id, data, { new: true });
+    return role!;
   }
-};
 
-export const deleteRole = async (id: string) => {
-  try {
-    const role = await Role.findByIdAndUpdate(
-      id,
-      { status: false },
-      { new: true }
-    );
-    return role;
-  } catch (error) {
-    throw new Error((error as Error).message);
+  async remove(id: string): Promise<RoleDocument> {
+    await this.ensureExists(id);
+    const role = await this.roleModel.findByIdAndUpdate(id, { status: false }, { new: true });
+    return role!;
   }
-};
+
+  async ensureExists(id: string): Promise<RoleDocument> {
+    const role = await this.roleModel.findById(id);
+    if (!role) {
+      throw new NotFoundException("El rol no existe");
+    }
+    return role;
+  }
+}

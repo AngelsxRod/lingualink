@@ -1,15 +1,37 @@
-import { Resources } from "#resource";
-import type { CreateResourceDto } from "@lingualink/shared";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { put } from "@vercel/blob";
+import { Resource, ResourceDocument } from "./resource.schema";
+import { CreateResourceDto } from "./dto/create-resource.dto";
 
-export const createResource = async (data: CreateResourceDto & { filePath: string }) => {
-  const newResource = new Resources(data);
-  return await newResource.save();
-};
+@Injectable()
+export class ResourceService {
+  constructor(@InjectModel(Resource.name) private readonly resourceModel: Model<ResourceDocument>) {}
 
-export const getAllResources = async () => {
-  return await Resources.find();
-};
+  async create(data: CreateResourceDto, file?: Express.Multer.File): Promise<ResourceDocument> {
+    if (!file) {
+      throw new BadRequestException("Archivo es requerido");
+    }
 
-export const getResourceById = async (id: string) => {
-  return await Resources.findById(id);
-};
+    const blob = await put(`resources/${Date.now()}-${file.originalname}`, file.buffer, {
+      access: "public",
+      contentType: file.mimetype,
+    });
+
+    const resource = new this.resourceModel({ ...data, filePath: blob.url });
+    return resource.save();
+  }
+
+  async findAll(): Promise<ResourceDocument[]> {
+    return this.resourceModel.find();
+  }
+
+  async findOne(id: string): Promise<ResourceDocument> {
+    const resource = await this.resourceModel.findById(id);
+    if (!resource) {
+      throw new NotFoundException("Recurso no encontrado");
+    }
+    return resource;
+  }
+}
