@@ -1,41 +1,29 @@
-import type { Request, Response } from "express";
-import { getTags, createTag, updateTag, deleteTag } from "#tag";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { TagService } from "./tag.service";
+import { CreateTagDto } from "./dto/create-tag.dto";
+import { UpdateTagDto } from "./dto/update-tag.dto";
 
-export const getTagsController = async (req: Request, res: Response) => {
-  try {
-    const { page, pageSize } = req.query as { page?: string; pageSize?: string };
-    const tags = await getTags(page, pageSize);
-    return res.json(tags);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
-  }
-};
+@Controller("tags")
+export class TagController {
+  constructor(private readonly tagService: TagService) {}
 
-export const createTagController = async (req: Request, res: Response) => {
-  try {
-    const tag = await createTag(req.body);
-    return res.json(tag);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Get()
+  findAll(@Query("page") page?: string, @Query("pageSize") pageSize?: string) {
+    return this.tagService.findAll(page, pageSize);
   }
-};
 
-export const updateTagController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const tag = await updateTag(id, req.body);
-    return res.json(tag);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Post()
+  create(@Body() dto: CreateTagDto) {
+    return this.tagService.create(dto);
   }
-};
 
-export const deleteTagController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const tag = await deleteTag(id);
-    return res.json(tag);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Put(":id")
+  update(@Param("id") id: string, @Body() dto: UpdateTagDto) {
+    return this.tagService.update(id, dto);
   }
-};
+
+  @Delete(":id")
+  remove(@Param("id") id: string) {
+    return this.tagService.remove(id);
+  }
+}

@@ -1,58 +1,39 @@
-import type { Request, Response } from "express";
-import { put } from "@vercel/blob";
-import {
-  createResource,
-  getAllResources,
-  getResourceById,
-} from "#resource";
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { extname } from "path";
+import { memoryStorage } from "multer";
+import { ResourceService } from "./resource.service";
+import { CreateResourceDto } from "./dto/create-resource.dto";
 
-export const addResource = async (req: Request, res: Response) => {
-  try {
-    const { title, description } = req.body;
-    const file = req.file;
+@Controller("resource")
+export class ResourceController {
+  constructor(private readonly resourceService: ResourceService) {}
 
-    if (!file) {
-      return res.status(400).json({ message: "Archivo es requerido" });
-    }
-
-    const blob = await put(`resources/${Date.now()}-${file.originalname}`, file.buffer, {
-      access: "public",
-      contentType: file.mimetype,
-    });
-
-    const resourceData = {
-      title,
-      description,
-      filePath: blob.url,
-    };
-
-    const newResource = await createResource(resourceData);
-    res.status(201).json(newResource);
-  } catch (error) {
-    res.status(500).json({ message: "Error al agregar el recurso", error });
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(
+    FileInterceptor("file", {
+      storage: memoryStorage(),
+      fileFilter: (_req, file, cb) => {
+        if (extname(file.originalname).toLowerCase() === ".pdf") {
+          cb(null, true);
+        } else {
+          cb(new BadRequestException("Solo se permiten archivos PDF"), false);
+        }
+      },
+    }),
+  )
+  create(@Body() dto: CreateResourceDto, @UploadedFile() file?: Express.Multer.File) {
+    return this.resourceService.create(dto, file);
   }
-};
 
-export const listAllResources = async (req: Request, res: Response) => {
-  try {
-    const resources = await getAllResources();
-    res.status(200).json(resources);
-  } catch (error) {
-    res.status(500).json({ message: "Error al obtener los recursos", error });
+  @Get()
+  findAll() {
+    return this.resourceService.findAll();
   }
-};
 
-export const getResource = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const resource = await getResourceById(id);
-
-    if (!resource) {
-      return res.status(404).json({ message: "Recurso no encontrado" });
-    }
-
-    res.status(200).json(resource);
-  } catch (error) {
-    res.status(500).json({ message: "Error al obtener el recurso", error });
+  @Get(":id")
+  findOne(@Param("id") id: string) {
+    return this.resourceService.findOne(id);
   }
-};
+}

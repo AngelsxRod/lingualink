@@ -1,97 +1,52 @@
-import type { Request, Response } from "express";
-import {
-  getQuestions,
-  createQuestion,
-  updateQuestion,
-  deleteQuestion,
-  voteQuestion,
-  getQuestionById,
-} from "#question";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
+import { QuestionService } from "./question.service";
+import { CreateQuestionDto } from "./dto/create-question.dto";
+import { UpdateQuestionDto } from "./dto/update-question.dto";
+import { VoteQuestionDto } from "./dto/vote-question.dto";
+import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { CurrentUser } from "../../common/decorators/current-user.decorator";
+import type { UserDocument } from "../user/user.schema";
 
-export const getQuestionsController = async (req: Request, res: Response) => {
-  try {
-    const { page, pageSize, tags, sortBy } = req.query as {
-      page?: string;
-      pageSize?: string;
-      tags?: string;
-      sortBy?: string;
-    };
+@Controller("question")
+export class QuestionController {
+  constructor(private readonly questionService: QuestionService) {}
 
-    const filters = {
-      tags: tags ? tags.split(",") : [],
-      sortBy,
-    };
-
-    const questions = await getQuestions(filters, page, pageSize);
-    return res.json(questions);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Get()
+  findAll(
+    @Query("page") page?: string,
+    @Query("pageSize") pageSize?: string,
+    @Query("tags") tags?: string,
+    @Query("sortBy") sortBy?: string,
+  ) {
+    return this.questionService.findAll({ tags: tags ? tags.split(",") : [], sortBy }, page, pageSize);
   }
-};
 
-export const getQuestionByIdController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const question = await getQuestionById(id);
-    if (!question) {
-      return res.status(404).json({ message: "Pregunta no existe" });
-    }
-    return res.json(question);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Get(":id")
+  findOne(@Param("id") id: string) {
+    return this.questionService.findOne(id);
   }
-};
 
-export const createQuestionController = async (req: Request, res: Response) => {
-  try {
-    const { title, content, tags } = req.body;
-    const { id: user } = req.user!;
-    const questionData = {
-      title,
-      content,
-      user,
-      tags,
-    };
-    const question = await createQuestion(questionData);
-    return res.json(question);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  create(@Body() dto: CreateQuestionDto, @CurrentUser() user: UserDocument) {
+    return this.questionService.create(dto, user.id);
   }
-};
 
-export const updateQuestionController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const question = await updateQuestion(id, req.body);
-    return res.json(question);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Put(":id")
+  @UseGuards(JwtAuthGuard)
+  update(@Param("id") id: string, @Body() dto: UpdateQuestionDto, @CurrentUser() user: UserDocument) {
+    return this.questionService.update(id, dto, user.id);
   }
-};
 
-export const deleteQuestionController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const question = await deleteQuestion(id);
-    return res.json(question);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Delete(":id")
+  @UseGuards(JwtAuthGuard)
+  remove(@Param("id") id: string, @CurrentUser() user: UserDocument) {
+    return this.questionService.remove(id, user.id);
   }
-};
 
-export const voteQuestionController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { vote } = req.body;
-    const { id: userId } = req.user!;
-    const questionData = {
-      id,
-      userId,
-      vote,
-    };
-    const question = await voteQuestion(questionData);
-    return res.json(question);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Post(":id/vote")
+  @UseGuards(JwtAuthGuard)
+  vote(@Param("id") id: string, @Body() dto: VoteQuestionDto, @CurrentUser() user: UserDocument) {
+    return this.questionService.vote(id, user.id, dto.vote);
   }
-};
+}

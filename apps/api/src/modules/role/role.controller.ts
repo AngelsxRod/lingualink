@@ -1,41 +1,29 @@
-import type { Request, Response } from "express";
-import { getRoles, createRole, updateRole, deleteRole } from "#role";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { RoleService } from "./role.service";
+import { CreateRoleDto } from "./dto/create-role.dto";
+import { UpdateRoleDto } from "./dto/update-role.dto";
 
-export const getRolesController = async (req: Request, res: Response) => {
-  try {
-    const { page, pageSize } = req.query as { page?: string; pageSize?: string };
-    const roles = await getRoles(page, pageSize);
-    return res.json(roles);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
-  }
-};
+@Controller("role")
+export class RoleController {
+  constructor(private readonly roleService: RoleService) {}
 
-export const createRoleController = async (req: Request, res: Response) => {
-  try {
-    const role = await createRole(req.body);
-    return res.json(role);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Get()
+  findAll(@Query("page") page?: string, @Query("pageSize") pageSize?: string) {
+    return this.roleService.findAll(page, pageSize);
   }
-};
 
-export const updateRoleController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const role = await updateRole(id, req.body);
-    return res.json(role);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Post()
+  create(@Body() dto: CreateRoleDto) {
+    return this.roleService.create(dto);
   }
-};
 
-export const deleteRoleController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const role = await deleteRole(id);
-    return res.json(role);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Put(":id")
+  update(@Param("id") id: string, @Body() dto: UpdateRoleDto) {
+    return this.roleService.update(id, dto);
   }
-};
+
+  @Delete(":id")
+  remove(@Param("id") id: string) {
+    return this.roleService.remove(id);
+  }
+}

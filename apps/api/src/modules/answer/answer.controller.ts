@@ -1,73 +1,46 @@
-import type { Request, Response } from "express";
-import {
-  getAnswers,
-  createAnswer,
-  updateAnswer,
-  deleteAnswer,
-  voteAnswer,
-} from "#answer";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
+import { AnswerService } from "./answer.service";
+import { CreateAnswerDto } from "./dto/create-answer.dto";
+import { UpdateAnswerDto } from "./dto/update-answer.dto";
+import { VoteAnswerDto } from "./dto/vote-answer.dto";
+import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { CurrentUser } from "../../common/decorators/current-user.decorator";
+import type { UserDocument } from "../user/user.schema";
 
-export const getAnswersController = async (req: Request, res: Response) => {
-  try {
-    const { questionId } = req.params;
-    const { page, pageSize } = req.query as { page?: string; pageSize?: string };
-    const answers = await getAnswers(page, pageSize, questionId);
-    return res.json(answers);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
-  }
-};
+@Controller("answer")
+export class AnswerController {
+  constructor(private readonly answerService: AnswerService) {}
 
-export const createAnswerController = async (req: Request, res: Response) => {
-  try {
-    const { questionId } = req.params;
-    const { content } = req.body;
-    const { id: user } = req.user!;
-    const answerData = {
-      content,
-      user,
-      questionId,
-    };
-    const answer = await createAnswer(answerData);
-    return res.json(answer);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Get(":questionId")
+  findAll(
+    @Param("questionId") questionId: string,
+    @Query("page") page?: string,
+    @Query("pageSize") pageSize?: string,
+  ) {
+    return this.answerService.findAll(questionId, page, pageSize);
   }
-};
 
-export const updateAnswerController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const answer = await updateAnswer(id, req.body);
-    return res.json(answer);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Post(":questionId")
+  @UseGuards(JwtAuthGuard)
+  create(@Param("questionId") questionId: string, @Body() dto: CreateAnswerDto, @CurrentUser() user: UserDocument) {
+    return this.answerService.create(questionId, dto, user.id);
   }
-};
 
-export const deleteAnswerController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const answer = await deleteAnswer(id);
-    return res.json(answer);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Put(":id")
+  @UseGuards(JwtAuthGuard)
+  update(@Param("id") id: string, @Body() dto: UpdateAnswerDto, @CurrentUser() user: UserDocument) {
+    return this.answerService.update(id, dto, user.id);
   }
-};
 
-export const voteAnswerController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { vote } = req.body;
-    const { id: userId } = req.user!;
-    const answerData = {
-      id,
-      userId,
-      vote,
-    };
-    const answer = await voteAnswer(answerData);
-    return res.json(answer);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Delete(":id")
+  @UseGuards(JwtAuthGuard)
+  remove(@Param("id") id: string, @CurrentUser() user: UserDocument) {
+    return this.answerService.remove(id, user.id);
   }
-};
+
+  @Post(":id/vote")
+  @UseGuards(JwtAuthGuard)
+  vote(@Param("id") id: string, @Body() dto: VoteAnswerDto, @CurrentUser() user: UserDocument) {
+    return this.answerService.vote(id, user.id, dto.vote);
+  }
+}

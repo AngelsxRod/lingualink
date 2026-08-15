@@ -1,31 +1,31 @@
-import type { Request, Response } from "express";
-import { createUser, getUsers, getProfile } from "#user";
+import { Body, Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
+import { UserService } from "./user.service";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { PermissionsGuard } from "../../common/guards/permissions.guard";
+import { Permissions } from "../../common/decorators/permissions.decorator";
+import { CurrentUser } from "../../common/decorators/current-user.decorator";
+import type { UserDocument } from "./user.schema";
 
-export const createUserController = async (req: Request, res: Response) => {
-  try {
-    const user = await createUser(req.body);
-    return res.json(user);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
-  }
-};
+@Controller("user")
+export class UserController {
+  constructor(private readonly userService: UserService) {}
 
-export const getUsersController = async (req: Request, res: Response) => {
-  try {
-    const { page, pageSize } = req.query as { page?: string; pageSize?: string };
-    const users = await getUsers(page, pageSize);
-    return res.json(users);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Get()
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions("LISTAR_USUARIOS")
+  findAll(@Query("page") page?: string, @Query("pageSize") pageSize?: string) {
+    return this.userService.findAll(page, pageSize);
   }
-};
 
-export const getProfileController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.user!;
-    const user = await getProfile(id);
-    return res.json(user);
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
+  @Get("profile")
+  @UseGuards(JwtAuthGuard)
+  getProfile(@CurrentUser() user: UserDocument) {
+    return this.userService.findProfile(user.id);
   }
-};
+
+  @Post()
+  create(@Body() dto: CreateUserDto) {
+    return this.userService.create(dto);
+  }
+}
