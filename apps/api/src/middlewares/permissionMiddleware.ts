@@ -16,9 +16,8 @@ export const permissionMiddleware = (...permissionNames: string[]) => {
         return res.status(403).json({ message: "Rol no encontrado" });
       }
 
-      const hasPermission = role.permissions.some((p: { name: string }) =>
-        permissionNames.includes(p.name)
-      );
+      const permissions = role.permissions as unknown as { name: string }[];
+      const hasPermission = permissions.some((p) => permissionNames.includes(p.name));
 
       if (!hasPermission) {
         return res
