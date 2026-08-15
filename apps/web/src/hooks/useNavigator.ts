@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 const useNavigator = () => {
   const navigate = useNavigate();
 
-  const goTo = (path) => {
+  const goTo = (path: string) => {
     navigate(path);
   };
 
