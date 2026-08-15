@@ -21,7 +21,17 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(cors());
+
+const allowedOrigins = (process.env.CORS_ORIGINS || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: allowedOrigins.length ? allowedOrigins : true,
+  }),
+);
 app.use(helmet());
 app.use(morgan("dev"));
 
